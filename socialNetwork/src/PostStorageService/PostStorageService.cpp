@@ -15,7 +15,7 @@ using apache::thrift::server::TThreadedServer;
 using apache::thrift::transport::TFramedTransportFactory;
 using apache::thrift::transport::TServerSocket;
 using namespace social_network;
-
+ 
 static memcached_pool_st* memcached_client_pool;
 static mongoc_client_pool_t* mongodb_client_pool;
 
@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
 
   int mongodb_conns = config_json["post-storage-mongodb"]["connections"];
   int mongodb_timeout = config_json["post-storage-mongodb"]["timeout_ms"];
-
+  //Memcached加载配置文件
   int memcached_conns = config_json["post-storage-memcached"]["connections"];
   int memcached_timeout = config_json["post-storage-memcached"]["timeout_ms"];
-
+  //Memcached初始化用户池
   memcached_client_pool = init_memcached_client_pool(
       config_json, "post-storage", 32, memcached_conns);
   mongodb_client_pool =
