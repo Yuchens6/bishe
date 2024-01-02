@@ -44,10 +44,10 @@ int main(int argc, char* argv[]) {
 
   int mongodb_conns = config_json["user-mongodb"]["connections"];
   int mongodb_timeout = config_json["user-mongodb"]["timeout_ms"];
-
+  //Memcached加载配置文件
   int memcached_conns = config_json["user-memcached"]["connections"];
   int memcached_timeout = config_json["user-memcached"]["timeout_ms"];
-
+  //Memcached初始化用户池
   memcached_client_pool =
       init_memcached_client_pool(config_json, "user", 32, memcached_conns);
   mongodb_client_pool =
