@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
   std::string rabbitmq_addr =
       config_json["write-home-timeline-rabbitmq"]["addr"];
   int rabbitmq_port = config_json["write-home-timeline-rabbitmq"]["port"];
-
+  //redis加载配置文件
   std::string redis_addr = config_json["home-timeline-redis"]["addr"];
   int redis_port = config_json["home-timeline-redis"]["port"];
   int redis_conns = config_json["home-timeline-redis"]["connections"];
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
       config_json["social-graph-service"]["timeout_ms"];
   int social_graph_service_keepalive =
       config_json["social-graph-service"]["keepalive_ms"];
-
+  //redis创建用户池
   ClientPool<RedisClient> redis_client_pool("redis", redis_addr, redis_port, 0,
                                             redis_conns, redis_timeout,
                                             redis_keepalive, config_json);
