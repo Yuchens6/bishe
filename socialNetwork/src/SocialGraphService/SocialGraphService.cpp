@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   int user_conns = config_json["user-service"]["connections"];
   int user_timeout = config_json["user-service"]["timeout_ms"];
   int user_keepalive = config_json["user-service"]["keepalive_ms"];
-
+  //Redis加载配置文件
   int redis_cluster_config_flag = config_json["social-graph-redis"]["use_cluster"];
   int redis_replica_config_flag = config_json["social-graph-redis"]["use_replica"];
   mongoc_client_pool_t *mongodb_client_pool =
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
   std::shared_ptr<TServerSocket> server_socket =
       get_server_socket(config_json, "0.0.0.0", port);
-
+ //使用redis集群
   if (redis_cluster_flag || redis_cluster_config_flag) {
     RedisCluster redis_cluster_client_pool =
         init_redis_cluster_client_pool(config_json, "social-graph");
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     LOG(info) << "Starting the social-graph-service server with Redis Cluster support...";
     server.serve();
   }
-  
+  //使用redis复制体
   else if (redis_replica_config_flag) {
       Redis redis_replica_client_pool = init_redis_replica_client_pool(config_json, "redis-replica");
       Redis redis_primary_client_pool = init_redis_replica_client_pool(config_json, "redis-primary");
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
       LOG(info) << "Starting the social-graph-service server with Redis replica support";
       server.serve();
   }
-
+//使用redis本体
   else {
     Redis redis_client_pool =
         init_redis_client_pool(config_json, "social-graph");
