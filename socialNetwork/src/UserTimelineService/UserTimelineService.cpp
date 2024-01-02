@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
   int mongodb_conns = config_json["user-timeline-mongodb"]["connections"];
   int mongodb_timeout = config_json["user-timeline-mongodb"]["timeout_ms"];
-
+  //redis加载配置文件
   int redis_cluster_config_flag = config_json["user-timeline-redis"]["use_cluster"];
   int redis_replica_config_flag = config_json["user-timeline-redis"]["use_replica"];
 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
   mongoc_client_pool_push(mongodb_client_pool, mongodb_client);
   std::shared_ptr<TServerSocket> server_socket =
       get_server_socket(config_json, "0.0.0.0", port);
-
+  //使用redis集群
   if (redis_cluster_flag || redis_cluster_config_flag) {
     RedisCluster redis_client_pool =
         init_redis_cluster_client_pool(config_json, "user-timeline");
@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
     LOG(info) << "Starting the user-timeline-service server with Redis Cluster support...";
     server.serve();
   }
+  //使用redis复制体
   else if (redis_replica_config_flag) {
       Redis redis_replica_client_pool = init_redis_replica_client_pool(config_json, "redis-replica");
       Redis redis_primary_client_pool = init_redis_replica_client_pool(config_json, "redis-primary");
@@ -135,6 +136,7 @@ int main(int argc, char *argv[]) {
       server.serve();
 
   }
+  //使用redis本体
   else {
     Redis redis_client_pool =
         init_redis_client_pool(config_json, "user-timeline");
