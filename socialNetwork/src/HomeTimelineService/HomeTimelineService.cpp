@@ -56,8 +56,10 @@ int main(int argc, char *argv[]) {
   if (load_config_file("config/service-config.json", &config_json) != 0) {
     exit(EXIT_FAILURE);
   }
-
+ 
   int port = config_json["home-timeline-service"]["port"];
+
+  //redis配置文件加载
   int redis_cluster_config_flag = config_json["home-timeline-redis"]["use_cluster"];
 
   int redis_replica_config_flag = config_json["home-timeline-redis"]["use_replica"];
@@ -94,7 +96,7 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<TServerSocket> server_socket =
       get_server_socket(config_json, "0.0.0.0", port);
 
-
+ //优先使用redis复制体
   if (redis_replica_config_flag) {
           Redis redis_replica_client_pool = init_redis_replica_client_pool(config_json, "redis-replica");
           Redis redis_primary_client_pool = init_redis_replica_client_pool(config_json, "redis-primary");
@@ -113,7 +115,7 @@ int main(int argc, char *argv[]) {
 
       
   }
-
+//使用redis集群
   else if (redis_cluster_flag || redis_cluster_config_flag) {
     RedisCluster redis_cluster_client_pool =
         init_redis_cluster_client_pool(config_json, "home-timeline");
@@ -127,7 +129,7 @@ int main(int argc, char *argv[]) {
 
     LOG(info) << "Starting the home-timeline-service server with Redis Cluster support...";
     server.serve();
-  } else {
+  } else {    //使用redids
     Redis redis_client_pool =
         init_redis_client_pool(config_json, "home-timeline");
     TThreadedServer server(
