@@ -15,26 +15,36 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  social-graph-mongodb:
-    image: mongo:4.4.6
-    hostname: social-graph-mongodb
+  #social-graph-mongodb:
+   # image: mongo:4.4.6
+    #hostname: social-graph-mongodb
     # ports:
     #   - 27018:27017
+    #restart: always
+
+  mongodb:
+    image: mongo
+    hostname: mongodb
     restart: always
 
-  social-graph-redis:
-    image: redis
-    hostname: social-graph-redis
+  #social-graph-redis:
+   # image: redis
+    #hostname: social-graph-redis
     # ports:
     #   - 6380:6379
-    restart: always
+    #restart: always
 
-  home-timeline-redis:
+  redis: 
     image: redis
-    hostname: home-timeline-redis
+    hostname: redis_cli
+    restart: always
+  
+ # home-timeline-redis:
+  #  image: redis
+   # hostname: home-timeline-redis
     # ports:
     #   - 6381:6379
-    restart: always
+   # restart: always
 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
@@ -64,19 +74,24 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  post-storage-memcached:
-    image: memcached
-    hostname: post-storage-memcached
+ # post-storage-memcached:
+  #  image: memcached
+  #  hostname: post-storage-memcached
     #    ports:
     #      - 11212:11211
+  #  restart: always
+
+  memcached:
+    image: memcached
+    hostname: memcached
     restart: always
 
-  post-storage-mongodb:
-    image: mongo:4.4.6
-    hostname: post-storage-mongodb
+ # post-storage-mongodb:
+ #   image: mongo:4.4.6
+ #   hostname: post-storage-mongodb
     #    ports:
     #      - 27019:27017
-    restart: always
+  #  restart: always
 
   user-timeline-service:
     image: deathstarbench/social-network-microservices:latest
@@ -93,19 +108,19 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  user-timeline-redis:
-    image: redis
-    hostname: user-timeline-redis
+#  user-timeline-redis:
+ #   image: redis
+  #  hostname: user-timeline-redis
     #    ports:
     #      - 6383:6379
-    restart: always
+   # restart: always
 
-  user-timeline-mongodb:
-    image: mongo:4.4.6
-    hostname: user-timeline-mongodb
+ # user-timeline-mongodb:
+ #   image: mongo:4.4.6
+ #   hostname: user-timeline-mongodb
     #    ports:
     #      - 27020:27017
-    restart: always
+  #  restart: always
 
   url-shorten-service:
     image: deathstarbench/social-network-microservices:latest
@@ -122,19 +137,19 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  url-shorten-memcached:
-    image: memcached
-    hostname: url-shorten-memcached
+#  url-shorten-memcached:
+ #   image: memcached
+ #   hostname: url-shorten-memcached
     #    ports:
     #      - 11213:11211
-    restart: always
+#   restart: always
 
-  url-shorten-mongodb:
-    image: mongo:4.4.6
-    hostname: url-shorten-mongodb
+#  url-shorten-mongodb:
+ #   image: mongo:4.4.6
+ #   hostname: url-shorten-mongodb
     #    ports:
     #      - 27021:27017
-    restart: always
+ #   restart: always
 
   user-service:
     image: deathstarbench/social-network-microservices:latest
@@ -151,19 +166,19 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  user-memcached:
-    image: memcached
-    hostname: user-memcached
+#  user-memcached:
+  #  image: memcached
+  #  hostname: user-memcached
     #    ports:
     #      - 11214:11211
-    restart: always
+  #  restart: always
 
-  user-mongodb:
-    image: mongo:4.4.6
-    hostname: user-mongodb
+ # user-mongodb:
+  #  image: mongo:4.4.6
+  #  hostname: user-mongodb
     # ports:
     #   - 27023:27017
-    restart: always
+  #  restart: always
 
   media-service:
     image: deathstarbench/social-network-microservices:latest
@@ -180,19 +195,19 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  media-memcached:
-    image: memcached
-    hostname: media-memcached
+ # media-memcached:
+ #   image: memcached
+  #  hostname: media-memcached
     #    ports:
     #      - 11215:11211
-    restart: always
+ #   restart: always
 
-  media-mongodb:
-    image: mongo:4.4.6
-    hostname: media-mongodb
+ # media-mongodb:
+  #  image: mongo:4.4.6
+   # hostname: media-mongodb
     #    ports:
     #      - 27024:27017
-    restart: always
+   # restart: always
 
   text-service:
     image: deathstarbench/social-network-microservices:latest
