@@ -36,7 +36,7 @@ services:
 
   redis: 
     image: redis
-    hostname: redis_cli
+    hostname: redis
     restart: always
   
  # home-timeline-redis:
