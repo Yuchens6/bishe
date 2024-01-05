@@ -54,8 +54,8 @@ services:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    hostname: home-timeline-redis
-    image: redis_cli
+    hostname: redis
+    image: redis
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
