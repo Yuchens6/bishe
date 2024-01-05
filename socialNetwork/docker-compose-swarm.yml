@@ -39,12 +39,23 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  home-timeline-redis:
+# home-timeline-redis:
+ #   depends_on:
+  #    - jaeger-agent
+  #    - jaeger-query
+ #   hostname: home-timeline-redis
+ #   image: redis
+ #   command: "redis-server /social-network-microservices/config/redis.conf"
+#    volumes:
+#      - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
+
+  redis:
     depends_on:
       - jaeger-agent
       - jaeger-query
     hostname: home-timeline-redis
-    image: redis
+    image: redis_cli
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
@@ -81,11 +92,23 @@ services:
       - ./media-frontend/lua-scripts:/usr/local/openresty/nginx/lua-scripts
       - ./media-frontend/conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
 
-  media-memcached:
+ # media-memcached:
+ #   depends_on:
+ #     - jaeger-agent
+  #    - jaeger-query
+ #   hostname: media-memcached
+ #   image: memcached
+ #   command:
+ #     - "-m 16384"
+ #     - "-t 8"
+  #    - "-I 32m"
+  #    - "-c 4096"
+
+  memcached:
     depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: media-memcached
+        - jaeger-agent
+        - jaeger-query
+    hostname: memcached
     image: memcached
     command:
       - "-m 16384"
@@ -93,12 +116,24 @@ services:
       - "-I 32m"
       - "-c 4096"
 
-  media-mongodb:
+ # media-mongodb:
+ #   depends_on:
+ #     - jaeger-agent
+  #    - jaeger-query
+  #  hostname: media-mongodb
+ #   image: mongo:4.4.6
+ #   command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+    # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 2"
+ #   volumes:
+ #     - ./config:/social-network-microservices/config
+ #     - ./keys:/keys
+
+  mongodb:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    hostname: media-mongodb
-    image: mongo:4.4.6
+    hostname: mongodb
+    image: mongo
     command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 2"
     volumes:
@@ -142,29 +177,29 @@ services:
       - ./docker/openresty-thrift/lua-thrift:/usr/local/openresty/lualib/thrift
       - ./keys:/keys
 
-  post-storage-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: post-storage-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+#  post-storage-memcached:
+ #   depends_on:
+ #     - jaeger-agent
+  #    - jaeger-query
+ #   hostname: post-storage-memcached
+ #   image: memcached
+ #   command:
+ #     - "-m 16384"
+   #   - "-t 8"
+  #    - "-I 32m"
+  #    - "-c 4096"
 
-  post-storage-mongodb:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: post-storage-mongodb
-    image: mongo:4.4.6
-    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+#  post-storage-mongodb:
+ #   depends_on:
+  #    - jaeger-agent
+  #    - jaeger-query
+#    hostname: post-storage-mongodb
+ #   image: mongo:4.4.6
+  #  command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 75"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+ #   volumes:
+   #   - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
 
   post-storage-service:
     depends_on:
@@ -182,28 +217,28 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  social-graph-mongodb:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: social-graph-mongodb
-    image: mongo:4.4.6
-    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+#  social-graph-mongodb:
+#    depends_on:
+ #     - jaeger-agent
+ #     - jaeger-query
+#    hostname: social-graph-mongodb
+#    image: mongo:4.4.6
+#    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 16"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+ #   volumes:
+ #     - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
 
-  social-graph-redis:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: social-graph-redis
-    image: redis
-    command: "redis-server /social-network-microservices/config/redis.conf"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#  social-graph-redis:
+ #   depends_on:
+#      - jaeger-agent
+#      - jaeger-query
+#    hostname: social-graph-redis
+#    image: redis
+#    command: "redis-server /social-network-microservices/config/redis.conf"
+#    volumes:
+ #     - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
 
   social-graph-service:
     depends_on:
@@ -251,29 +286,29 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  url-shorten-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: url-shorten-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+#  url-shorten-memcached:
+ #   depends_on:
+ #     - jaeger-agent
+#      - jaeger-query
+#    hostname: url-shorten-memcached
+#    image: memcached
+ #   command:
+ #     - "-m 16384"
+ #     - "-t 8"
+ #     - "-I 32m"
+ #     - "-c 4096"
 
-  url-shorten-mongodb:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: url-shorten-mongodb
-    image: mongo:4.4.6
-    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+ # url-shorten-mongodb:
+ #   depends_on:
+  #    - jaeger-agent
+   #   - jaeger-query
+  #  hostname: url-shorten-mongodb
+  #  image: mongo:4.4.6
+  #  command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 36"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
 
   url-shorten-service:
     depends_on:
@@ -291,17 +326,17 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  user-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: user-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+ # user-memcached:
+   # depends_on:
+  #    - jaeger-agent
+   #   - jaeger-query
+  #  hostname: user-memcached
+ #   image: memcached
+  #  command:
+  #    - "-m 16384"
+   #   - "-t 8"
+  #    - "-I 32m"
+  #    - "-c 4096"
 
   user-mention-service:
     depends_on:
@@ -318,17 +353,17 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  user-mongodb:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: user-mongodb
-    image: mongo:4.4.6
-    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+ # user-mongodb:
+ #   depends_on:
+  #    - jaeger-agent
+  #    - jaeger-query
+ #   hostname: user-mongodb
+ #   image: mongo:4.4.6
+  #  command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 8"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+   #   - ./keys:/keys
 
   user-service:
     depends_on:
@@ -346,28 +381,28 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  user-timeline-mongodb:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: user-timeline-mongodb
-    image: mongo:4.4.6
-    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+#  user-timeline-mongodb:
+#    depends_on:
+  #    - jaeger-agent
+#      - jaeger-query
+#    hostname: user-timeline-mongodb
+ #   image: mongo:4.4.6
+#    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 75"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+ #   volumes:
+#      - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
 
-  user-timeline-redis:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: user-timeline-redis
-    image: redis
-    command: "redis-server /social-network-microservices/config/redis.conf"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#  user-timeline-redis:
+ #   depends_on:
+  #    - jaeger-agent
+  #    - jaeger-query
+ #   hostname: user-timeline-redis
+  #  image: redis
+  #  command: "redis-server /social-network-microservices/config/redis.conf"
+  #  volumes:
+  #    - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
 
   user-timeline-service:
     depends_on:
