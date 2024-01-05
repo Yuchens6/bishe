@@ -55,14 +55,14 @@ services:
       - ./scripts:/scripts
     entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
-  social-graph-redis-cluster-setup:
-    image: redis
-    depends_on:
-      social-graph-redis:
-        condition: service_started
-    volumes:
-      - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n social-graph-redis
+#  social-graph-redis-cluster-setup:
+ #   image: redis
+#    depends_on:
+#      social-graph-redis:
+#        condition: service_started
+#    volumes:
+#      - ./scripts:/scripts
+#    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n social-graph-redis
 
 #  home-timeline-redis:
 #    image: redis
