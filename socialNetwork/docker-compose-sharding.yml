@@ -13,7 +13,7 @@ services:
         condition: service_started
       social-graph-mongodb:
         condition: service_started
-      social-graph-redis-cluster-setup:
+      redis:
         condition: service_completed_successfully
     restart: always
     entrypoint: SocialGraphService --redis-cluster
@@ -106,7 +106,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      post-storage-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: PostStorageService
     volumes:
@@ -142,9 +142,9 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      user-timeline-mongodb:
+      mongodb:
         condition: service_started
-      user-timeline-redis-cluster-setup:
+      redis:
         condition: service_completed_successfully
     entrypoint: UserTimelineService --redis-cluster
     volumes:
@@ -187,7 +187,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      url-shorten-mongodb:
+      mongodb:
         condition: service_started
     volumes:
       - ./config:/social-network-microservices/config
@@ -215,7 +215,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      user-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserService
     volumes:
@@ -243,7 +243,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      media-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: MediaService
@@ -311,7 +311,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      home-timeline-redis-cluster-setup:
+      redis:
         condition: service_completed_successfully
     restart: always
     entrypoint: HomeTimelineService --redis-cluster
