@@ -20,7 +20,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      social-graph-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: SocialGraphService
@@ -126,7 +126,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      post-storage-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: PostStorageService
     volumes:
@@ -178,7 +178,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      user-timeline-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserTimelineService
     volumes:
@@ -225,7 +225,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      url-shorten-mongodb:
+      mongodb:
         condition: service_started
     volumes:
       - ./config:/social-network-microservices/config
@@ -266,7 +266,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      user-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserService
     volumes:
@@ -307,7 +307,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      media-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: MediaService
