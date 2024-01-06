@@ -22,10 +22,10 @@ services:
     #   - 27018:27017
     #restart: always
 
-  mongodb:
-    image: mongo
-    hostname: mongodb
-    restart: always
+#  mongodb:
+ #   image: mongo
+ #   hostname: mongodb
+#    restart: always
 
   #social-graph-redis:
    # image: redis
@@ -34,10 +34,10 @@ services:
     #   - 6380:6379
     #restart: always
 
-  redis: 
-    image: redis
-    hostname: redis
-    restart: always
+#  redis: 
+#    image: redis
+ #   hostname: redis
+#    restart: always
   
  # home-timeline-redis:
   #  image: redis
@@ -81,10 +81,10 @@ services:
     #      - 11212:11211
   #  restart: always
 
-  memcached:
-    image: memcached
-    hostname: memcached
-    restart: always
+#  memcached:
+#    image: memcached
+#    hostname: memcached
+#    restart: always
 
  # post-storage-mongodb:
  #   image: mongo:4.4.6
