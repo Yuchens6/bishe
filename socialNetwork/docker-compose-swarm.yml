@@ -50,12 +50,12 @@ services:
 #      - ./config:/social-network-microservices/config
   #    - ./keys:/keys
 
-  redis:
+  redis-7000:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    hostname: redis
-    image: redis
+    hostname: redis-7000
+    image: redis-7000
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
@@ -142,7 +142,7 @@ services:
 
   media-service:
     depends_on:
-      - media-mongodb
+      - mongodb
       - jaeger-agent
       - jaeger-query
     deploy:
@@ -203,7 +203,7 @@ services:
 
   post-storage-service:
     depends_on:
-      - post-storage-mongodb
+      - mongodb
       - jaeger-agent
       - jaeger-query
     deploy:
