@@ -34,10 +34,10 @@ services:
     #   - 6380:6379
     #restart: always
 
-  redis: 
-    image: redis
-    hostname: redis
-    restart: always
+ # redis: 
+   # image: redis
+  #  hostname: redis
+  #  restart: always
   
  # home-timeline-redis:
   #  image: redis
