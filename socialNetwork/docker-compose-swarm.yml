@@ -244,7 +244,7 @@ services:
     depends_on:
       - jaeger-agent
       - jaeger-query
-      - social-graph-mongodb
+      - mongodb
     deploy:
       replicas: 1
       restart_policy:
@@ -312,7 +312,7 @@ services:
 
   url-shorten-service:
     depends_on:
-      - url-shorten-mongodb
+      - mongodb
       - jaeger-agent
       - jaeger-query
     deploy:
@@ -367,7 +367,7 @@ services:
 
   user-service:
     depends_on:
-      - user-mongodb
+      - mongodb
       - jaeger-agent
       - jaeger-query
     deploy:
@@ -406,7 +406,7 @@ services:
 
   user-timeline-service:
     depends_on:
-      - user-timeline-mongodb
+      - mongodb
       - jaeger-agent
     deploy:
       replicas: 1
