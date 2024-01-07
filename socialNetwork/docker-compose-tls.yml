@@ -71,9 +71,9 @@ services:
  #     - ./config:/social-network-microservices/config
   #    - ./keys:/keys
 
-  redis:
-    image: redis
-    hostname: redis
+  redis-7000:
+    image: redis-7000
+    hostname: redis-7000
     # ports:
     #   - 6380:6379
     depends_on:
