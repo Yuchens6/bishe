@@ -50,11 +50,11 @@ services:
 #      - ./config:/social-network-microservices/config
   #    - ./keys:/keys
 
-  redis-7000:
+  redis:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    hostname: redis-7000
+    hostname: redis
     image: redis-7000
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
