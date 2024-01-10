@@ -27,9 +27,9 @@ services:
     #   - 27018:27017
     restart: always
 
-  social-graph-redis:
+  redis:
     image: redis
-    hostname: social-graph-redis
+    hostname: redis
     deploy:
       replicas: 5
     # ports:
@@ -41,27 +41,27 @@ services:
   social-graph-redis-cluster-setup:
     image: redis
     depends_on:
-      social-graph-redis:
+      redis:
         condition: service_started
     volumes:
       - ./scripts:/scripts
     entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n social-graph-redis
 
-  home-timeline-redis:
-    image: redis
-    hostname: home-timeline-redis
-    deploy:
-      replicas: 5
+#  redis:
+ #   image: redis
+ #   hostname: redis
+  #  deploy:
+   #   replicas: 5
     # ports:
     #   - 6381:6379
-    restart: always
-    command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
+ #   restart: always
+ #   command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
 
   # Setup for redis cluster
   home-timeline-redis-cluster-setup:
     image: redis
     depends_on:
-      home-timeline-redis:
+      redis:
         condition: service_started
     volumes:
       - ./scripts:/scripts
@@ -126,21 +126,21 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  user-timeline-redis:
-    image: redis
-    hostname: user-timeline-redis
-    deploy:
-      replicas: 5
+#  user-timeline-redis:
+ #   image: redis
+ #   hostname: user-timeline-redis
+ #   deploy:
+ #    replicas: 5
     #    ports:
     #      - 6383:6379
-    restart: always
-    command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
+  #  restart: always
+  #  command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
 
   # Setup for redis cluster
   user-timeline-redis-cluster-setup:
     image: redis
     depends_on:
-      user-timeline-redis:
+      redis:
         condition: service_started
     volumes:
       - ./scripts:/scripts
