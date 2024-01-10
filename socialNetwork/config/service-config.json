@@ -43,7 +43,7 @@
     "timeout_ms": 10000,
     "port": 6379,
     "connections": 512,
-    "use_cluster": 1,
+    "use_cluster": 0,
     "use_replica": 0
   },
   "social-graph-redis": {
@@ -52,7 +52,7 @@
     "timeout_ms": 10000,
     "port": 6379,
     "connections": 512,
-    "use_cluster": 1,
+    "use_cluster": 0,
     "use_replica": 0
   },
   "post-storage-service": {
@@ -68,7 +68,7 @@
     "timeout_ms": 10000,
     "port": 6379,
     "connections": 512,
-    "use_cluster": 1
+    "use_cluster": 0
   },
   "user-timeline-mongodb": {
     "keepalive_ms": 10000,
