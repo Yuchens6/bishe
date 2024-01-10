@@ -22,19 +22,26 @@ services:
     #   - 27018:27017
     restart: always
 
-  social-graph-redis:
+ # social-graph-redis:
+#    image: redis
+#    hostname: social-graph-redis
+    # ports:
+    #   - 6380:6379
+ #   restart: always
+    
+  redis:
     image: redis
-    hostname: social-graph-redis
+    hostname: redis
     # ports:
     #   - 6380:6379
     restart: always
-
-  home-timeline-redis:
-    image: redis
-    hostname: home-timeline-redis
+    
+#  home-timeline-redis:
+ #   image: redis
+ #   hostname: home-timeline-redis
     # ports:
     #   - 6381:6379
-    restart: always
+  #  restart: always
 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
@@ -93,12 +100,12 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  user-timeline-redis:
-    image: redis
-    hostname: user-timeline-redis
+#  user-timeline-redis:
+ #   image: redis
+  #  hostname: user-timeline-redis
     #    ports:
     #      - 6383:6379
-    restart: always
+#    restart: always
 
   user-timeline-mongodb:
     image: mongo:4.4.6
