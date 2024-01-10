@@ -55,7 +55,7 @@ services:
       - jaeger-agent
       - jaeger-query
     hostname: redis
-    image: redis-7000
+    image: redis
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
