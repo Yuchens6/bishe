@@ -13,7 +13,7 @@ services:
         condition: service_started
       mongodb:
         condition: service_started
-      redis-7000:
+      redis:
         condition: service_completed_successfully
     restart: always
     entrypoint: SocialGraphService --redis-cluster
@@ -46,10 +46,10 @@ services:
 
   # Setup for redis cluster
 
-  redis-7000:
-    image: redis-7000
+  redis:
+    image: redis
     depends_on:
-      redis-7000:
+      redis:
         condition: service_started
     volumes:
       - ./scripts:/scripts
@@ -144,7 +144,7 @@ services:
         condition: service_started
       mongodb:
         condition: service_started
-      redis-7000:
+      redis:
         condition: service_completed_successfully
     entrypoint: UserTimelineService --redis-cluster
     volumes:
@@ -311,7 +311,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      redis-7000:
+      redis:
         condition: service_completed_successfully
     restart: always
     entrypoint: HomeTimelineService --redis-cluster
