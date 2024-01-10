@@ -39,16 +39,27 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  home-timeline-redis:
+  redis:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    hostname: home-timeline-redis
+    hostname: redis
     image: redis
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
+  
+#  home-timeline-redis:
+#    depends_on:
+#      - jaeger-agent
+ #     - jaeger-query
+  #  hostname: home-timeline-redis
+  #  image: redis
+   # command: "redis-server /social-network-microservices/config/redis.conf"
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+    #  - ./keys:/keys
 
   home-timeline-service:
     depends_on:
@@ -194,16 +205,16 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  social-graph-redis:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: social-graph-redis
-    image: redis
-    command: "redis-server /social-network-microservices/config/redis.conf"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+ # social-graph-redis:
+#    depends_on:
+  #    - jaeger-agent
+  #    - jaeger-query
+ #   hostname: social-graph-redis
+ #   image: redis
+  #  command: "redis-server /social-network-microservices/config/redis.conf"
+ #   volumes:
+ #     - ./config:/social-network-microservices/config
+ #     - ./keys:/keys
 
   social-graph-service:
     depends_on:
@@ -358,16 +369,16 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  user-timeline-redis:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: user-timeline-redis
-    image: redis
-    command: "redis-server /social-network-microservices/config/redis.conf"
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#  user-timeline-redis:
+#    depends_on:
+#      - jaeger-agent
+#      - jaeger-query
+#    hostname: user-timeline-redis
+#    image: redis
+#    command: "redis-server /social-network-microservices/config/redis.conf"
+#    volumes:
+#      - ./config:/social-network-microservices/config
+#      - ./keys:/keys
 
   user-timeline-service:
     depends_on:
