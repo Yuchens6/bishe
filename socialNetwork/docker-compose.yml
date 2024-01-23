@@ -8,7 +8,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      social-graph-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: SocialGraphService
@@ -92,12 +92,12 @@ services:
     #      - 11212:11211
     restart: always
 
-  mongodb:
-    image: mongo:4.4.6
-    hostname: mongodb
+#  mongodb:
+ #   image: mongo:4.4.6
+ #   hostname: mongodb
     #    ports:
     #      - 27019:27017
-    restart: always
+#    restart: always
 
   user-timeline-service:
     image: deathstarbench/social-network-microservices:latest
@@ -121,12 +121,12 @@ services:
     #      - 6383:6379
 #    restart: always
 
-  mongodb:
-    image: mongo:4.4.6
-    hostname: mongodb
+#  mongodb:
+#    image: mongo:4.4.6
+#    hostname: mongodb
     #    ports:
     #      - 27020:27017
-    restart: always
+ #   restart: always
 
   url-shorten-service:
     image: deathstarbench/social-network-microservices:latest
@@ -150,12 +150,12 @@ services:
     #      - 11213:11211
 #    restart: always
 
-  mongodb:
-    image: mongo:4.4.6
-    hostname: mongodb
+#  mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: mongodb
     #    ports:
     #      - 27021:27017
-    restart: always
+   # restart: always
 
   user-service:
     image: deathstarbench/social-network-microservices:latest
@@ -179,12 +179,12 @@ services:
     #      - 11214:11211
 #    restart: always
 
-  mongodb:
-    image: mongo:4.4.6
-    hostname: mongodb
+#  mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: mongodb
     # ports:
     #   - 27023:27017
-    restart: always
+   # restart: always
 
   media-service:
     image: deathstarbench/social-network-microservices:latest
@@ -208,12 +208,12 @@ services:
     #      - 11215:11211
  #   restart: always
 
-  mongodb:
-    image: mongo:4.4.6
-    hostname: ongodb
+#  mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: ongodb
     #    ports:
     #      - 27024:27017
-    restart: always
+   # restart: always
 
   text-service:
     image: deathstarbench/social-network-microservices:latest
