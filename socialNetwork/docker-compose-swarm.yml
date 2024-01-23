@@ -49,6 +49,18 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
+
+  memcached:
+    depends_on:
+      - jaeger-agent
+      - jaeger-query
+    hostname: memcached
+    image: memcached
+    command:
+      - "-m 16384"
+      - "-t 8"
+      - "-I 32m"
+      - "-c 4096"
   
 #  home-timeline-redis:
 #    depends_on:
@@ -92,17 +104,17 @@ services:
       - ./media-frontend/lua-scripts:/usr/local/openresty/nginx/lua-scripts
       - ./media-frontend/conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
 
-  media-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: media-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+#  media-memcached:
+#    depends_on:
+  #    - jaeger-agent
+ #     - jaeger-query
+#    hostname: media-memcached
+#    image: memcached
+#    command:
+ #     - "-m 16384"
+#      - "-t 8"
+ #     - "-I 32m"
+  #    - "-c 4096"
 
   media-mongodb:
     depends_on:
@@ -153,17 +165,17 @@ services:
       - ./docker/openresty-thrift/lua-thrift:/usr/local/openresty/lualib/thrift
       - ./keys:/keys
 
-  post-storage-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: post-storage-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+#  post-storage-memcached:
+#    depends_on:
+#      - jaeger-agent
+#      - jaeger-query
+#    hostname: post-storage-memcached
+#    image: memcached
+#    command:
+#      - "-m 16384"
+#      - "-t 8"
+ #     - "-I 32m"
+  #    - "-c 4096"
 
   post-storage-mongodb:
     depends_on:
@@ -262,17 +274,17 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  url-shorten-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: url-shorten-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+ # url-shorten-memcached:
+  #  depends_on:
+   #   - jaeger-agent
+    #  - jaeger-query
+#    hostname: url-shorten-memcached
+#    image: memcached
+ #   command:
+  #    - "-m 16384"
+   #   - "-t 8"
+    #  - "-I 32m"
+     # - "-c 4096"
 
   url-shorten-mongodb:
     depends_on:
@@ -302,17 +314,17 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  user-memcached:
-    depends_on:
-      - jaeger-agent
-      - jaeger-query
-    hostname: user-memcached
-    image: memcached
-    command:
-      - "-m 16384"
-      - "-t 8"
-      - "-I 32m"
-      - "-c 4096"
+#  user-memcached:
+ #   depends_on:
+  #    - jaeger-agent
+   #   - jaeger-query
+    #hostname: user-memcached
+ #   image: memcached
+  #  command:
+   #   - "-m 16384"
+    #  - "-t 8"
+     # - "-I 32m"
+      #- "-c 4096"
 
   user-mention-service:
     depends_on:
