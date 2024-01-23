@@ -42,6 +42,16 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
+  memcached:
+    image: memcached
+    hostname: memcached
+    #    ports:
+    #      - 11212:11211
+    depends_on:
+      config:
+        condition: service_completed_successfully
+    restart: always
+
   redis:
     image: redis
     hostname: redis
@@ -118,15 +128,15 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  post-storage-memcached:
-    image: memcached
-    hostname: post-storage-memcached
+#  post-storage-memcached:
+#    image: memcached
+#    hostname: post-storage-memcached
     #    ports:
     #      - 11212:11211
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+   # restart: always
 
   post-storage-mongodb:
     image: mongo:4.4.6
@@ -206,15 +216,15 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  url-shorten-memcached:
-    image: memcached
-    hostname: url-shorten-memcached
+#  url-shorten-memcached:
+ #   image: memcached
+  #  hostname: url-shorten-memcached
     #    ports:
     #      - 11213:11211
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+   # restart: always
 
   url-shorten-mongodb:
     image: mongo:4.4.6
@@ -248,15 +258,15 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  user-memcached:
-    image: memcached
-    hostname: user-memcached
+#  user-memcached:
+ #   image: memcached
+  #  hostname: user-memcached
     #    ports:
     #      - 11214:11211
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+   # restart: always
 
   user-mongodb:
     image: mongo:4.4.6
@@ -290,15 +300,15 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  media-memcached:
-    image: memcached
-    hostname: media-memcached
+#  media-memcached:
+ #   image: memcached
+  #  hostname: media-memcached
     #    ports:
     #      - 11215:11211
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+   # restart: always
 
   media-mongodb:
     image: mongo:4.4.6
