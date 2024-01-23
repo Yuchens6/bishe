@@ -62,7 +62,7 @@ services:
       - "-I 32m"
       - "-c 4096"
 
-mongodb:
+  mongodb:
     depends_on:
       - jaeger-agent
       - jaeger-query
