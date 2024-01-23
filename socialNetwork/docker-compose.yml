@@ -15,12 +15,12 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  social-graph-mongodb:
-    image: mongo:4.4.6
-    hostname: social-graph-mongodb
+#  social-graph-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: social-graph-mongodb
     # ports:
     #   - 27018:27017
-    restart: always
+#    restart: always
 
  # social-graph-redis:
 #    image: redis
@@ -28,6 +28,13 @@ services:
     # ports:
     #   - 6380:6379
  #   restart: always
+
+  mongodb:
+    image: mongo:4.4.6
+    hostname: mongodb
+    # ports:
+    #   - 27018:27017
+    restart: always
     
   redis:
     image: redis
@@ -65,7 +72,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      post-storage-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: PostStorageService
     volumes:
@@ -85,9 +92,9 @@ services:
     #      - 11212:11211
     restart: always
 
-  post-storage-mongodb:
+  mongodb:
     image: mongo:4.4.6
-    hostname: post-storage-mongodb
+    hostname: mongodb
     #    ports:
     #      - 27019:27017
     restart: always
@@ -101,7 +108,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      user-timeline-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserTimelineService
     volumes:
@@ -114,9 +121,9 @@ services:
     #      - 6383:6379
 #    restart: always
 
-  user-timeline-mongodb:
+  mongodb:
     image: mongo:4.4.6
-    hostname: user-timeline-mongodb
+    hostname: mongodb
     #    ports:
     #      - 27020:27017
     restart: always
@@ -131,7 +138,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      url-shorten-mongodb:
+      mongodb:
         condition: service_started
     volumes:
       - ./config:/social-network-microservices/config
@@ -143,9 +150,9 @@ services:
     #      - 11213:11211
 #    restart: always
 
-  url-shorten-mongodb:
+  mongodb:
     image: mongo:4.4.6
-    hostname: url-shorten-mongodb
+    hostname: mongodb
     #    ports:
     #      - 27021:27017
     restart: always
@@ -159,7 +166,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      user-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserService
     volumes:
@@ -172,9 +179,9 @@ services:
     #      - 11214:11211
 #    restart: always
 
-  user-mongodb:
+  mongodb:
     image: mongo:4.4.6
-    hostname: user-mongodb
+    hostname: mongodb
     # ports:
     #   - 27023:27017
     restart: always
@@ -187,7 +194,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      media-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: MediaService
@@ -201,9 +208,9 @@ services:
     #      - 11215:11211
  #   restart: always
 
-  media-mongodb:
+  mongodb:
     image: mongo:4.4.6
-    hostname: media-mongodb
+    hostname: ongodb
     #    ports:
     #      - 27024:27017
     restart: always
