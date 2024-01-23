@@ -20,7 +20,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      social-graph-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: SocialGraphService
@@ -28,9 +28,23 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
-  social-graph-mongodb:
+#  social-graph-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: social-graph-mongodb
+    # ports:
+    #   - 27018:27017
+   # depends_on:
+#      config:
+ #       condition: service_completed_successfully
+  #  restart: always
+   # command: --config /social-network-microservices/config/mongod.conf
+    #volumes:
+   #   - ./config:/social-network-microservices/config
+    #  - ./keys:/keys
+
+  mongodb:
     image: mongo:4.4.6
-    hostname: social-graph-mongodb
+    hostname: mongodb
     # ports:
     #   - 27018:27017
     depends_on:
@@ -121,7 +135,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      post-storage-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: PostStorageService
     volumes:
@@ -138,19 +152,19 @@ services:
   #      condition: service_completed_successfully
    # restart: always
 
-  post-storage-mongodb:
-    image: mongo:4.4.6
-    hostname: post-storage-mongodb
+#  post-storage-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: post-storage-mongodb
     #    ports:
     #      - 27019:27017
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
-    command: --config /social-network-microservices/config/mongod.conf
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#    depends_on:
+#      config:
+#        condition: service_completed_successfully
+ #   restart: always
+  #  command: --config /social-network-microservices/config/mongod.conf
+   # volumes:
+    #  - ./config:/social-network-microservices/config
+     # - ./keys:/keys
 
   user-timeline-service:
     image: deathstarbench/social-network-microservices:latest
@@ -163,7 +177,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      user-timeline-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserTimelineService
     volumes:
@@ -184,19 +198,19 @@ services:
  #     - ./config:/social-network-microservices/config
 #      - ./keys:/keys
 
-  user-timeline-mongodb:
-    image: mongo:4.4.6
-    hostname: user-timeline-mongodb
+#  user-timeline-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: user-timeline-mongodb
     #    ports:
     #      - 27020:27017
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
-    command: --config /social-network-microservices/config/mongod.conf
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+   # restart: always
+ #   command: --config /social-network-microservices/config/mongod.conf
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+    #  - ./keys:/keys
 
   url-shorten-service:
     image: deathstarbench/social-network-microservices:latest
@@ -210,7 +224,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      url-shorten-mongodb:
+      mongodb:
         condition: service_started
     volumes:
       - ./config:/social-network-microservices/config
@@ -226,19 +240,19 @@ services:
   #      condition: service_completed_successfully
    # restart: always
 
-  url-shorten-mongodb:
-    image: mongo:4.4.6
-    hostname: url-shorten-mongodb
+#  url-shorten-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: url-shorten-mongodb
     #    ports:
     #      - 27021:27017
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
-    command: --config /social-network-microservices/config/mongod.conf
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+#    restart: always
+ #   command: --config /social-network-microservices/config/mongod.conf
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+    #  - ./keys:/keys
 
   user-service:
     image: deathstarbench/social-network-microservices:latest
@@ -251,7 +265,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      user-mongodb:
+      mongodb:
         condition: service_started
     entrypoint: UserService
     volumes:
@@ -268,19 +282,19 @@ services:
   #      condition: service_completed_successfully
    # restart: always
 
-  user-mongodb:
-    image: mongo:4.4.6
-    hostname: user-mongodb
+#  user-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: user-mongodb
     #    ports:
     #      - 27023:27017
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
-    command: --config /social-network-microservices/config/mongod.conf
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+#    restart: always
+ #   command: --config /social-network-microservices/config/mongod.conf
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+    #  - ./keys:/keys
 
   media-service:
     image: deathstarbench/social-network-microservices:latest
@@ -292,7 +306,7 @@ services:
         condition: service_completed_successfully
       jaeger-agent:
         condition: service_started
-      media-mongodb:
+      mongodb:
         condition: service_started
     restart: always
     entrypoint: MediaService
@@ -310,19 +324,19 @@ services:
   #      condition: service_completed_successfully
    # restart: always
 
-  media-mongodb:
-    image: mongo:4.4.6
-    hostname: media-mongodb
+#  media-mongodb:
+ #   image: mongo:4.4.6
+  #  hostname: media-mongodb
     #    ports:
     #      - 27024:27017
-    depends_on:
-      config:
-        condition: service_completed_successfully
-    restart: always
-    command: --config /social-network-microservices/config/mongod.conf
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+#    depends_on:
+ #     config:
+  #      condition: service_completed_successfully
+#    restart: always
+ #   command: --config /social-network-microservices/config/mongod.conf
+  #  volumes:
+   #   - ./config:/social-network-microservices/config
+    #  - ./keys:/keys
 
   text-service:
     image: deathstarbench/social-network-microservices:latest
