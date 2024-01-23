@@ -26,7 +26,12 @@ services:
     # ports:
     #   - 27018:27017
     restart: always
-
+  memcached:
+    image: memcached
+    hostname: memcached
+    #    ports:
+    #      - 11212:11211
+    restart: always
   redis:
     image: redis
     hostname: redis
@@ -95,12 +100,12 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  post-storage-memcached:
-    image: memcached
-    hostname: post-storage-memcached
+#  post-storage-memcached:
+#    image: memcached
+#    hostname: post-storage-memcached
     #    ports:
     #      - 11212:11211
-    restart: always
+#    restart: always
 
   post-storage-mongodb:
     image: mongo:4.4.6
@@ -168,12 +173,12 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  url-shorten-memcached:
-    image: memcached
-    hostname: url-shorten-memcached
+#  url-shorten-memcached:
+  #  image: memcached
+ #   hostname: url-shorten-memcached
     #    ports:
     #      - 11213:11211
-    restart: always
+  #  restart: always
 
   url-shorten-mongodb:
     image: mongo:4.4.6
@@ -197,12 +202,12 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  user-memcached:
-    image: memcached
-    hostname: user-memcached
+#  user-memcached:
+#    image: memcached
+ #   hostname: user-memcached
     #    ports:
     #      - 11214:11211
-    restart: always
+ #   restart: always
 
   user-mongodb:
     image: mongo:4.4.6
@@ -226,12 +231,12 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-  media-memcached:
-    image: memcached
-    hostname: media-memcached
+ # media-memcached:
+#    image: memcached
+#    hostname: media-memcached
     #    ports:
     #      - 11215:11211
-    restart: always
+#    restart: always
 
   media-mongodb:
     image: mongo:4.4.6
