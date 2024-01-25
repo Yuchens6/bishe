@@ -57,6 +57,7 @@ void PostStorageHandler::StorePost(
       "store_post_server", {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
+ //取出Mongodb用户
   mongoc_client_t *mongodb_client =
       mongoc_client_pool_pop(_mongodb_client_pool);
   if (!mongodb_client) {
@@ -65,7 +66,7 @@ void PostStorageHandler::StorePost(
     se.message = "Failed to pop a client from MongoDB pool";
     throw se;
   }
-
+//从用户中获取
   auto collection =
       mongoc_client_get_collection(mongodb_client, "post", "post");
   if (!collection) {
