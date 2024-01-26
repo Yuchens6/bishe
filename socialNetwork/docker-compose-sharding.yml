@@ -45,7 +45,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n social-graph-redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
   
 
@@ -57,7 +57,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n home-timeline-redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
@@ -127,7 +127,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n user-timeline-redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
   user-timeline-mongodb:
     image: mongo:4.4.6
