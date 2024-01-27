@@ -20,12 +20,7 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-#  social-graph-mongodb:
- #   image: mongo:4.4.6
-  #  hostname: social-graph-mongodb
-    # ports:
-    #   - 27018:27017
-   # restart: always
+
 
   mongodb:
     image: mongo:4.4.6
@@ -58,17 +53,8 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n social-graph-redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
-#  redis:
- #   image: redis
- #   hostname: redis
-  #  deploy:
-   #   replicas: 5
-    # ports:
-    #   - 6381:6379
- #   restart: always
- #   command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
 
   # Setup for redis cluster
   home-timeline-redis-cluster-setup:
@@ -78,7 +64,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n home-timeline-redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
@@ -139,15 +125,6 @@ services:
     volumes:
       - ./config:/social-network-microservices/config
 
-#  user-timeline-redis:
- #   image: redis
- #   hostname: user-timeline-redis
- #   deploy:
- #    replicas: 5
-    #    ports:
-    #      - 6383:6379
-  #  restart: always
-  #  command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
 
   # Setup for redis cluster
   user-timeline-redis-cluster-setup:
@@ -157,7 +134,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n user-timeline-redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
 #  user-timeline-mongodb:
  #   image: mongo:4.4.6
