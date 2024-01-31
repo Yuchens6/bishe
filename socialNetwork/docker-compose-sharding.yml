@@ -45,6 +45,37 @@ services:
     restart: always
     command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
 
+
+  redis-6381:
+    image: redis
+    hostname: redis-6381
+    deploy:
+      replicas: 5
+      ports:
+        - 6381:6379
+    restart: always
+    command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
+
+    redis-6382:
+    image: redis
+    hostname: redis-6382
+    deploy:
+      replicas: 5
+      ports:
+        - 6382:6379
+    restart: always
+    command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
+
+    redis-6383:
+    image: redis
+    hostname: redis-6383
+    deploy:
+      replicas: 5
+      ports:
+        - 6383:6379
+    restart: always
+    command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
+
   # Setup for redis cluster
   social-graph-redis-cluster-setup:
     image: redis
@@ -53,7 +84,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis-6381
 
 
   # Setup for redis cluster
@@ -64,7 +95,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis-6382
 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
@@ -134,7 +165,7 @@ services:
         condition: service_started
     volumes:
       - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis-6383
 
 #  user-timeline-mongodb:
  #   image: mongo:4.4.6
