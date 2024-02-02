@@ -47,7 +47,7 @@ services:
     image: redis
     deploy:
       replicas: 5
-    command: "redis-server /social-network-microservices/config/redis.conf"
+    command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
