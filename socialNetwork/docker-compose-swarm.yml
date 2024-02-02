@@ -52,6 +52,16 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
+  redis-cluster-setup:
+    image: redis
+    depends_on:
+      redis:
+        condition: service_started
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
+
+  
   memcached:
     depends_on:
       - jaeger-agent
