@@ -108,6 +108,7 @@ services:
     command: ["HomeTimelineService"]
     hostname: home-timeline-service
     image: deathstarbench/social-network-microservices:latest
+    entrypoint: HomeTimelineService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
