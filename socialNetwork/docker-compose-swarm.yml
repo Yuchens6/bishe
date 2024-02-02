@@ -125,7 +125,6 @@ redis_slave1:
     depends_on:
       - jaeger-agent
       - jaeger-query
-      - redis-cluster-setup
     deploy:
       replicas: 1
       restart_policy:
@@ -282,7 +281,6 @@ redis_slave1:
       - jaeger-agent
       - jaeger-query
       - mongodb
-      - redis-cluster-setup
     deploy:
       replicas: 1
       restart_policy:
@@ -446,7 +444,6 @@ redis_slave1:
     depends_on:
       - mongodb
       - jaeger-agent
-      - redis-cluster-setup
     deploy:
       replicas: 1
       restart_policy:
