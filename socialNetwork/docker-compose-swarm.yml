@@ -45,6 +45,8 @@ services:
       - jaeger-query
     hostname: redis
     image: redis
+    deploy:
+      replicas: 5
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
