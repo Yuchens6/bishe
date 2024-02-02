@@ -52,6 +52,15 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
+  # Setup for redis cluster
+  redis-cluster-setup:
+    image: redis
+    depends_on:
+      redis
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
+
 
   
   memcached:
