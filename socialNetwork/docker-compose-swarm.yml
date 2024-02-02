@@ -265,6 +265,7 @@ services:
     command: ["SocialGraphService"]
     hostname: social-graph-service
     image: deathstarbench/social-network-microservices:latest
+    entrypoint: SocialGraphService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
