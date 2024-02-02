@@ -13,7 +13,7 @@ services:
         condition: service_started
       mongodb:
         condition: service_started
-      social-graph-redis-cluster-setup:
+      redis-cluster-setup:
         condition: service_completed_successfully
     restart: always
     entrypoint: SocialGraphService --redis-cluster
@@ -46,7 +46,7 @@ services:
     command: --port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no
 
   # Setup for redis cluster
-  social-graph-redis-cluster-setup:
+  redis-cluster-setup:
     image: redis
     depends_on:
       redis:
@@ -56,16 +56,7 @@ services:
     entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
 
 
-  # Setup for redis cluster
-  home-timeline-redis-cluster-setup:
-    image: redis
-    depends_on:
-      redis:
-        condition: service_started
-    volumes:
-      - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
-
+ 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
     hostname: compose-post-service
@@ -119,22 +110,14 @@ services:
         condition: service_started
       mongodb:
         condition: service_started
-      user-timeline-redis-cluster-setup:
+      redis-cluster-setup:
         condition: service_completed_successfully
     entrypoint: UserTimelineService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
 
 
-  # Setup for redis cluster
-  user-timeline-redis-cluster-setup:
-    image: redis
-    depends_on:
-      redis:
-        condition: service_started
-    volumes:
-      - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
+
 
 #  user-timeline-mongodb:
  #   image: mongo:4.4.6
@@ -277,7 +260,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      home-timeline-redis-cluster-setup:
+      redis-cluster-setup:
         condition: service_completed_successfully
     restart: always
     entrypoint: HomeTimelineService --redis-cluster
