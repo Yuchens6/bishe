@@ -55,8 +55,7 @@ services:
   redis-cluster-setup:
     image: redis
     depends_on:
-      redis:
-        condition: service_started
+      - redis
     volumes:
       - ./scripts:/scripts
     entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
