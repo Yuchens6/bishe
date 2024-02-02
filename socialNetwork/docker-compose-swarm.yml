@@ -47,7 +47,7 @@ services:
     image: redis
     deploy:
       replicas: 5
-    command: "--port 6379 --cluster-config-file nodes.conf --cluster-enabled yes --cluster-node-timeout 5000 --save "" --appendonly no"
+    command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
@@ -101,7 +101,6 @@ services:
     command: ["HomeTimelineService"]
     hostname: home-timeline-service
     image: deathstarbench/social-network-microservices:latest
-    entrypoint: HomeTimelineService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
@@ -259,7 +258,6 @@ services:
     command: ["SocialGraphService"]
     hostname: social-graph-service
     image: deathstarbench/social-network-microservices:latest
-    entrypoint: SocialGraphService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
@@ -424,7 +422,6 @@ services:
     command: ["UserTimelineService"]
     hostname: user-timeline-service
     image: deathstarbench/social-network-microservices:latest
-    entrypoint: UserTimelineService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
 
