@@ -430,6 +430,7 @@ services:
     command: ["UserTimelineService"]
     hostname: user-timeline-service
     image: deathstarbench/social-network-microservices:latest
+    entrypoint: UserTimelineService --redis-cluster
     volumes:
       - ./config:/social-network-microservices/config
 
