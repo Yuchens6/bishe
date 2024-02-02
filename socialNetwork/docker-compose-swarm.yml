@@ -39,29 +39,52 @@ services:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
 
+  #redis:
+   # depends_on:
+   #   - jaeger-agent
+   #   - jaeger-query
+  #  hostname: redis
+#    image: redis
+ #   deploy:
+ #     replicas: 5
+   # command: "redis-server /social-network-microservices/config/redis.conf"
+ #   volumes:
+ #     - ./config:/social-network-microservices/config
+  #    - ./keys:/keys
+      
   redis:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    hostname: redis
     image: redis
-    deploy:
-      replicas: 5
+    hostname: redis
+    # ports:
+    #   - 6380:6379
+    restart: always
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
-
-  # Setup for redis cluster
-  redis-cluster-setup:
+      
+redis_slave1:
     image: redis
+    hostname: redis-s1
+    command: --replicaof 6379
     depends_on:
-      redis
+      - redis_master
     volumes:
-      - ./scripts:/scripts
-    entrypoint: /bin/bash /scripts/setup_redis_cluster.sh -n redis
-
-
+      - ./config:/social-network-microservices/config
+      - ./keys:/keys
+      
+  redis_slave2:
+    image: redis
+    hostname: redis-s2
+    command: --replicaof 6379
+    depends_on:
+      - redis_master
+    volumes:
+      - ./config:/social-network-microservices/config
+      - ./keys:/keys
   
   memcached:
     depends_on:
