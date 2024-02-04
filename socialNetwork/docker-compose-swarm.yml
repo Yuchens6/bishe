@@ -56,35 +56,25 @@ services:
     depends_on:
       - jaeger-agent
       - jaeger-query
-    image: redis
     hostname: redis
-    # ports:
-    #   - 6380:6379
-    restart: always
+    image: redis
     command: "redis-server /social-network-microservices/config/redis.conf"
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
-      
-redis_slave1:
+
+  redis_1:
     image: redis
-    hostname: redis-s1
-    command: --replicaof 6379
     depends_on:
-      - redis_master
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
-      
-  redis_slave2:
+      - redis
+    command: redis-server --slaveof redis 6379 
+
+
+  redis_2:
     image: redis
-    hostname: redis-s2
-    command: --replicaof 6379
     depends_on:
-      - redis_master
-    volumes:
-      - ./config:/social-network-microservices/config
-      - ./keys:/keys
+      - redis
+    command: redis-server --slaveof redis 6379 
   
   memcached:
     depends_on:
@@ -104,12 +94,30 @@ redis_slave1:
       - jaeger-query
     hostname: mongodb
     image: mongo:4.4.6
-    command: "mongod --nojournal --quiet --config /social-network-microservices/config/mongod.conf"
+    command: mongod --replSet rs0 --config /social-network-microservices/config/mongod.conf
     # command: "mongod --serviceExecutor adaptive --listenBacklog 1024 --syncdelay 3600 --wiredTigerCacheSizeGB 2"
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
-  
+
+  mongo_secondary1:
+    image: mongo:4.4.6
+    command: mongod --replSet rs0
+    depends_on:
+      - mongodb
+    volumes:
+      - ./config:/social-network-microservices/config
+      - ./keys:/keys
+      
+  mongo_secondary2:
+    image: mongo:4.4.6
+    command: mongod --replSet rs0
+    depends_on:
+      - mongo
+    volumes:
+      - ./config:/social-network-microservices/config
+      - ./keys:/keys
+      
 #  home-timeline-redis:
 #    depends_on:
 #      - jaeger-agent
