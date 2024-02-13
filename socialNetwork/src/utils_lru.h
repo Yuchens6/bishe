@@ -6,7 +6,7 @@
 
 namespace social_network {
   void lru(cpp_redis::client client){
-        int n = 1000;
+        int n = 10;
         std::vector<std::pair<std::string, std::string>> sortedKeysWithScores;
         client.zrevrangebyscore("sorted-keys", "+inf", "-inf", [&](cpp_redis::reply& reply){
             if (!reply.is_array()) return false;
