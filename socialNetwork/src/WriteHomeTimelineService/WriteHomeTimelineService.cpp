@@ -15,6 +15,7 @@
 #include "../logger.h"
 #include "../tracing.h"
 #include "../utils.h"
+#include "../utils_lru.h"
 
 using namespace social_network;
 
@@ -92,6 +93,7 @@ void OnReceivedWorker(const AMQP::Message &msg) {
       throw se;
     }
     auto redis_client = redis_client_wrapper->GetClient();
+    lru(redis_client);
     std::vector<std::string> options{"NX"};
     std::string post_id_str = std::to_string(post_id);
     std::string timestamp_str = std::to_string(timestamp);
