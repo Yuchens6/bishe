@@ -14,6 +14,7 @@
 #include "../ClientPool.h"
 #include "../ThriftClient.h"
 #include "../logger.h"
+#include "../utils.h"
 #include "../tracing.h"
 
 using namespace sw::redis;
