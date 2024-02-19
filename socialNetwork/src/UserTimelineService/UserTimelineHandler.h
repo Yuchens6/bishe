@@ -147,6 +147,15 @@ void UserTimelineHandler::ReadUserTimeline(
       {opentracing::ChildOf(&span->context())});
 
   std::vector<std::string> post_ids_str;
+ auto redis_client_wrapper = _redis_client_pool->Pop();
+    if (!redis_client_wrapper) {
+      ServiceException se;
+      se.errorCode = ErrorCode::SE_REDIS_ERROR;
+      se.message = "Cannot connect to Redis server";
+      throw se;
+    }
+    auto redis_client = redis_client_wrapper->GetClient();
+    lru(redis_client);
   try {
     if (_redis_client_pool)
       _redis_client_pool->zrevrange(std::to_string(user_id), start, stop - 1,
