@@ -3,7 +3,7 @@
 
 #include "RedisClient.h"
 #include <cpp_redis/cpp_redis>
-
+using namespace sw::redis;
 namespace social_network {
   void lru(cpp_redis::client client){
         int n = 10;
