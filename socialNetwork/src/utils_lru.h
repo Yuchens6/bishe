@@ -1,6 +1,6 @@
 #ifndef SOCIAL_NETWORK_MICROSERVICES_REDISCLIENT_H
 #define SOCIAL_NETWORK_MICROSERVICES_REDISCLIENT_H
-
+#include <sw/redis++/redis++.h>
 #include "RedisClient.h"
 #include <cpp_redis/cpp_redis>
 using namespace sw::redis;
