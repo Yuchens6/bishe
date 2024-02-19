@@ -15,6 +15,8 @@
 #include "../ThriftClient.h"
 #include "../logger.h"
 #include "../RedisClient.h"
+#include "../utils_lru.h"
+#include "../utils_lru.h"
 #include "../utils.h"
 #include "../tracing.h"
 
