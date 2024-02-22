@@ -3,7 +3,7 @@
 #include <sw/redis++/redis++.h>
 #include "RedisClient.h"
 #include <cpp_redis/cpp_redis>
-    
+#include <mongoc.h>    
 #include <iostream>
 
 using namespace sw::redis;
