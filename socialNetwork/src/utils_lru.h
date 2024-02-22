@@ -5,38 +5,11 @@
 #include <cpp_redis/cpp_redis>
     
 #include <iostream>
-#include "hiredis/hiredis.h"
 
 using namespace sw::redis;
 namespace social_network {
   void lru(cpp_redis::client client){
-  redisContext* redis = redisConnect("127.0.0.1", 6379); // 这里的IP地址和端口号根据实际情况修改
-if (redis == NULL || redis->err) {
-    std::cout << "无法连接到 Redis 服务器！错误信息：" << redis->errstr << std::endl;
-    return -1;
-} else {
-    std::cout << "成功连接到 Redis 服务器！" << std::endl;
-}
-    const char* command = "INFO MEMORY";
-redisReply* reply = static_cast<redisReply*>(redisCommand(redis, command));
-if (!reply) {
-    std::cerr << "无法执行命令！" << std::endl;
-    return -1;
-}
-std::string infoStr((char*)reply->str, reply->len);
-size_t startPos = infoStr.find("used_memory:");
-size_t endPos = infoStr.find("\n", startPos + sizeof("used_memory:"));
-std::string usedMemoryStr = infoStr.substr(startPos + sizeof("used_memory:"), endPos - startPos - sizeof("used_memory:")).trim();
-int usedMemory = atoi(usedMemoryStr.c_str());
- 
-startPos = infoStr.find("maxmemory:");
-endPos = infoStr.find("\n", startPos + sizeof("maxmemory:"));
-std::string maxMemoryStr = infoStr.substr(startPos + sizeof("maxmemory:"), endPos - startPos - sizeof("maxmemory:")).trim();
-int maxMemory = atoi(maxMemoryStr.c_str());
- 
-double percentageUsed = ((double)(usedMemory * 100)) / maxMemory;
-std::cout << "已使用内存占总内存的百分比为：" << percentageUsed << "%" << std::endl;
-    if(percentageUsed>=90){
+  
        mongoc_client_t *mongodb_client =
       mongoc_client_pool_pop(_mongodb_client_pool);
   if (!mongodb_client) {
@@ -113,7 +86,6 @@ std::cout << "已使用内存占总内存的百分比为：" << percentageUsed <
   mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
         }
   }
-  }     
 }
 
 
