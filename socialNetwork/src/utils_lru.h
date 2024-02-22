@@ -29,7 +29,7 @@ namespace social_network {
   }
   bson_t *query = bson_new();
 
-        int n = 10;
+        int n = 1;
         std::vector<std::pair<std::string, std::string>> sortedKeysWithScores;
         client.zrevrangebyscore("sorted-keys", "+inf", "-inf", [&](cpp_redis::reply& reply){
             if (!reply.is_array()) return false;
