@@ -12,6 +12,7 @@
 #include "../tracing.h"
 #include "../utils.h"
 #include "../utils_mongodb.h"
+#include "../utils_memcached.h"
 #include "../utils_redis.h"
 #include "../utils_thrift.h"
 #include "UserTimelineHandler.h"
@@ -22,7 +23,14 @@ using apache::thrift::transport::TFramedTransportFactory;
 using apache::thrift::transport::TServerSocket;
 using namespace social_network;
 
-void sigintHandler(int sig) { exit(EXIT_SUCCESS); }
+static memcached_pool_st* memcached_client_pool;
+
+void sigintHandler(int sig) { 
+  if (memcached_client_pool != nullptr) {
+    memcached_pool_destroy(memcached_client_pool);
+  }
+  exit(EXIT_SUCCESS); 
+}
 
 int main(int argc, char *argv[]) {
   signal(SIGINT, sigintHandler);
@@ -81,6 +89,16 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  int memcached_conns = config_json["post-storage-memcached"]["connections"];
+  int memcached_timeout = config_json["post-storage-memcached"]["timeout_ms"];
+  //Memcached初始化用户池
+  memcached_client_pool = init_memcached_client_pool(
+      config_json, "post-storage", 32, memcached_conns);
+ 
+  if (memcached_client_pool == nullptr) {
+    return EXIT_FAILURE;
+  }
+
   if (redis_replica_config_flag && (redis_cluster_config_flag || redis_cluster_flag)) {
       LOG(error) << "Can't start service when Redis Cluster and Redis Replica are enabled at the same time";
       exit(EXIT_FAILURE);
@@ -113,7 +131,7 @@ int main(int argc, char *argv[]) {
         init_redis_cluster_client_pool(config_json, "user-timeline");
     TThreadedServer server(std::make_shared<UserTimelineServiceProcessor>(
                                std::make_shared<UserTimelineHandler>(
-                                   &redis_client_pool, mongodb_client_pool,
+                                   &redis_client_pool, mongodb_client_pool,memcached_client_pool
                                    &post_storage_client_pool)),
                            server_socket,
                            std::make_shared<TFramedTransportFactory>(),
@@ -127,7 +145,7 @@ int main(int argc, char *argv[]) {
       Redis redis_primary_client_pool = init_redis_replica_client_pool(config_json, "redis-primary");
       TThreadedServer server(std::make_shared<UserTimelineServiceProcessor>(
           std::make_shared<UserTimelineHandler>(
-              &redis_replica_client_pool, &redis_primary_client_pool, mongodb_client_pool,
+              &redis_replica_client_pool, &redis_primary_client_pool, mongodb_client_pool,memcached_client_pool
               &post_storage_client_pool)),
           server_socket,
           std::make_shared<TFramedTransportFactory>(),
@@ -142,7 +160,7 @@ int main(int argc, char *argv[]) {
         init_redis_client_pool(config_json, "user-timeline");
     TThreadedServer server(std::make_shared<UserTimelineServiceProcessor>(
                                std::make_shared<UserTimelineHandler>(
-                                   &redis_client_pool, mongodb_client_pool,
+                                   &redis_client_pool, mongodb_client_pool,memcached_client_pool
                                    &post_storage_client_pool)),
                            server_socket,
                            std::make_shared<TFramedTransportFactory>(),
