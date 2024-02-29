@@ -14,9 +14,6 @@
 #include "../ClientPool.h"
 #include "../ThriftClient.h"
 #include "../logger.h"
-#include "../RedisClient.h"
-#include "../utils_lru.h"
-#include "../utils.h"
 #include "../tracing.h"
 
 using namespace sw::redis;
@@ -102,7 +99,65 @@ void UserTimelineHandler::WriteUserTimeline(
       "write_user_timeline_server", {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
- 
+  mongoc_client_t *mongodb_client =
+      mongoc_client_pool_pop(_mongodb_client_pool);
+  if (!mongodb_client) {
+    ServiceException se;
+    se.errorCode = ErrorCode::SE_MONGODB_ERROR;
+    se.message = "Failed to pop a client from MongoDB pool";
+    throw se;
+  }
+  auto collection = mongoc_client_get_collection(
+      mongodb_client, "user-timeline", "user-timeline");
+  if (!collection) {
+    ServiceException se;
+    se.errorCode = ErrorCode::SE_MONGODB_ERROR;
+    se.message = "Failed to create collection user-timeline from MongoDB";
+    mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
+    throw se;
+  }
+  bson_t *query = bson_new();
+
+  BSON_APPEND_INT64(query, "user_id", user_id);
+  bson_t *update =
+      BCON_NEW("$push", "{", "posts", "{", "$each", "[", "{", "post_id",
+               BCON_INT64(post_id), "timestamp", BCON_INT64(timestamp), "}",
+               "]", "$position", BCON_INT32(0), "}", "}");
+  bson_error_t error;
+  bson_t reply;
+  auto update_span = opentracing::Tracer::Global()->StartSpan(
+      "write_user_timeline_mongo_insert_client",
+      {opentracing::ChildOf(&span->context())});
+  bool updated = mongoc_collection_find_and_modify(collection, query, nullptr,
+                                                   update, nullptr, false, true,
+                                                   true, &reply, &error);
+  update_span->Finish();
+
+  if (!updated) {
+    // update the newly inserted document (upsert: false)
+    updated = mongoc_collection_find_and_modify(collection, query, nullptr,
+                                                update, nullptr, false, false,
+                                                true, &reply, &error);
+    if (!updated) {
+      LOG(error) << "Failed to update user-timeline for user " << user_id
+                 << " to MongoDB: " << error.message;
+      ServiceException se;
+      se.errorCode = ErrorCode::SE_MONGODB_ERROR;
+      se.message = error.message;
+      bson_destroy(update);
+      bson_destroy(query);
+      bson_destroy(&reply);
+      mongoc_collection_destroy(collection);
+      mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
+      throw se;
+    }
+  }
+
+  bson_destroy(update);
+  bson_destroy(&reply);
+  bson_destroy(query);
+  mongoc_collection_destroy(collection);
+  mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
 
   // Update user's timeline in redis
   auto redis_span = opentracing::Tracer::Global()->StartSpan(
@@ -149,15 +204,6 @@ void UserTimelineHandler::ReadUserTimeline(
       {opentracing::ChildOf(&span->context())});
 
   std::vector<std::string> post_ids_str;
- auto redis_client_wrapper = _redis_client_pool->Pop();
-    if (!redis_client_wrapper) {
-      ServiceException se;
-      se.errorCode = ErrorCode::SE_REDIS_ERROR;
-      se.message = "Cannot connect to Redis server";
-      throw se;
-    }
-    auto redis_client = redis_client_wrapper->GetClient();
-    lru(redis_client);
   try {
     if (_redis_client_pool)
       _redis_client_pool->zrevrange(std::to_string(user_id), start, stop - 1,
