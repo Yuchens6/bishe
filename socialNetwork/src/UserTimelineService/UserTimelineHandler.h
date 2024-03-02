@@ -440,7 +440,7 @@ void UserTimelineHandler::ReadUserTimeline(
            _post_client_pool->Keepalive(post_client_wrapper);
         }
        for (auto &post_id : post_ids) {
-         _return.emplace_back(return_map[post_id]);
+         _return_posts.emplace_back(return_map[post_id]);
        }
         
         return _return_posts;
