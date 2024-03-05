@@ -6,6 +6,8 @@
 #include <future>
 #include <iostream>
 #include <string>
+#include <libmemcached/memcached.h>
+#include <libmemcached/util.h>
 
 #include "../../gen-cpp/HomeTimelineService.h"
 #include "../../gen-cpp/PostStorageService.h"
