@@ -4,7 +4,8 @@
 #include <bson/bson.h>
 #include <mongoc.h>
 #include <sw/redis++/redis++.h>
-
+#include <libmemcached/memcached.h>
+#include <libmemcached/util.h>
 #include <future>
 #include <iostream>
 #include <string>
@@ -46,39 +47,43 @@ class UserTimelineHandler : public UserTimelineServiceIf {
   Redis *_redis_replica_pool;
   Redis *_redis_primary_pool;
   RedisCluster *_redis_cluster_client_pool;
+  memcached_pool_st *_memcached_client_pool;
   mongoc_client_pool_t *_mongodb_client_pool;
   ClientPool<ThriftClient<PostStorageServiceClient>> *_post_client_pool;
 };
 
 UserTimelineHandler::UserTimelineHandler(
-    Redis *redis_pool, mongoc_client_pool_t *mongodb_pool,
+    Redis *redis_pool, mongoc_client_pool_t *mongodb_pool,memcached_pool_st *memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool) {
   _redis_client_pool = redis_pool;
   _redis_replica_pool = nullptr;
   _redis_primary_pool = nullptr;
   _redis_cluster_client_pool = nullptr;
+ _memcached_client_pool = memcached_client_pool;
   _mongodb_client_pool = mongodb_pool;
   _post_client_pool = post_client_pool;
 }
 
 UserTimelineHandler::UserTimelineHandler(
-    Redis* redis_replica_pool, Redis* redis_primary_pool, mongoc_client_pool_t* mongodb_pool,
+    Redis* redis_replica_pool, Redis* redis_primary_pool, mongoc_client_pool_t* mongodb_pool,*memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>>* post_client_pool) {
     _redis_client_pool = nullptr;
     _redis_replica_pool = redis_replica_pool;
     _redis_primary_pool = redis_primary_pool;
     _redis_cluster_client_pool = nullptr;
+ _memcached_client_pool = memcached_client_pool;
     _mongodb_client_pool = mongodb_pool;
     _post_client_pool = post_client_pool;
 }
 
 UserTimelineHandler::UserTimelineHandler(
-    RedisCluster *redis_pool, mongoc_client_pool_t *mongodb_pool,
+    RedisCluster *redis_pool, mongoc_client_pool_t *mongodb_pool,*memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool) {
   _redis_cluster_client_pool = redis_pool;
   _redis_replica_pool = nullptr;
   _redis_primary_pool = nullptr;
   _redis_client_pool = nullptr;
+ _memcached_client_pool = memcached_client_pool;
   _mongodb_client_pool = mongodb_pool;
   _post_client_pool = post_client_pool;
 }
