@@ -19,17 +19,17 @@ using namespace sw::redis;
 namespace social_network {
 class HomeTimelineHandler : public HomeTimelineServiceIf {
  public:
-  HomeTimelineHandler(Redis *,
+  HomeTimelineHandler(Redis *,memcached_pool_st *,
                       ClientPool<ThriftClient<PostStorageServiceClient>> *,
                       ClientPool<ThriftClient<SocialGraphServiceClient>> *);
 
 
-  HomeTimelineHandler(Redis *,Redis *,
+  HomeTimelineHandler(Redis *,Redis *,memcached_pool_st *,
       ClientPool<ThriftClient<PostStorageServiceClient>>*,
       ClientPool<ThriftClient<SocialGraphServiceClient>>*);
 
 
-  HomeTimelineHandler(RedisCluster *,
+  HomeTimelineHandler(RedisCluster *,memcached_pool_st *,
                       ClientPool<ThriftClient<PostStorageServiceClient>> *,
                       ClientPool<ThriftClient<SocialGraphServiceClient>> *);
   ~HomeTimelineHandler() override = default;
@@ -48,12 +48,13 @@ class HomeTimelineHandler : public HomeTimelineServiceIf {
      Redis *_redis_primary_pool;
      Redis *_redis_client_pool;
      RedisCluster *_redis_cluster_client_pool;
+     memcached_pool_st *_memcached_client_pool;
      ClientPool<ThriftClient<PostStorageServiceClient>> *_post_client_pool;
      ClientPool<ThriftClient<SocialGraphServiceClient>> *_social_graph_client_pool;
 };
 
 HomeTimelineHandler::HomeTimelineHandler(
-    Redis *redis_pool,
+    Redis *redis_pool,memcached_pool_st *memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool,
     ClientPool<ThriftClient<SocialGraphServiceClient>>
         *social_graph_client_pool) {
@@ -62,11 +63,12 @@ HomeTimelineHandler::HomeTimelineHandler(
     _redis_client_pool = redis_pool;
     _redis_cluster_client_pool = nullptr;
     _post_client_pool = post_client_pool;
+   _memcached_client_pool = memcached_client_pool;
     _social_graph_client_pool = social_graph_client_pool;
 }
 
 HomeTimelineHandler::HomeTimelineHandler(
-    RedisCluster *redis_pool,
+    RedisCluster *redis_pool,memcached_pool_st *memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool,
     ClientPool<ThriftClient<SocialGraphServiceClient>>
         *social_graph_client_pool) {
@@ -74,13 +76,14 @@ HomeTimelineHandler::HomeTimelineHandler(
     _redis_replica_pool = nullptr;
     _redis_client_pool = nullptr;
     _redis_cluster_client_pool = redis_pool; 
+   _memcached_client_pool = memcached_client_pool;
     _post_client_pool = post_client_pool;
     _social_graph_client_pool = social_graph_client_pool;
 }
 
 HomeTimelineHandler::HomeTimelineHandler(
     Redis *redis_replica_pool,
-    Redis *redis_primary_pool,
+    Redis *redis_primary_pool,memcached_pool_st *memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>>* post_client_pool,
     ClientPool<ThriftClient<SocialGraphServiceClient>>
     * social_graph_client_pool) {
@@ -88,6 +91,7 @@ HomeTimelineHandler::HomeTimelineHandler(
     _redis_replica_pool = redis_replica_pool;
     _redis_client_pool = nullptr;
     _redis_cluster_client_pool = nullptr;
+ _memcached_client_pool = memcached_client_pool;
     _post_client_pool = post_client_pool;
     _social_graph_client_pool = social_graph_client_pool;
 }
@@ -269,7 +273,126 @@ void HomeTimelineHandler::ReadHomeTimeline(
   }
   auto post_client = post_client_wrapper->GetClient();
   try {
-    post_client->ReadPosts(_return, req_id, post_ids, writer_text_map);
+
+    if (post_ids.empty()) {
+           return;
+         }
+       
+         std::set<int64_t> post_ids_not_cached(post_ids.begin(), post_ids.end());
+         if (post_ids_not_cached.size() != post_ids.size()) {
+           LOG(error)<< "Post_ids are duplicated";
+           ServiceException se;
+           se.errorCode = ErrorCode::SE_THRIFT_HANDLER_ERROR;
+           se.message = "Post_ids are duplicated";
+           throw se;
+         }
+         std::map<int64_t, Post> return_map;
+         memcached_return_t memcached_rc;
+         auto memcached_client =
+             memcached_pool_pop(_memcached_client_pool, true, &memcached_rc);
+         if (!memcached_client) {
+           ServiceException se;
+           se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
+           se.message = "Failed to pop a client from memcached pool";
+           throw se;
+         }
+       
+         char **keys;
+         size_t *key_sizes;
+         keys = new char *[post_ids.size()];
+         key_sizes = new size_t[post_ids.size()];
+         int idx = 0;
+         for (auto &post_id : post_ids) {
+           std::string key_str = std::to_string(post_id);
+           keys[idx] = new char[key_str.length() + 1];
+           strcpy(keys[idx], key_str.c_str());
+           key_sizes[idx] = key_str.length();
+           idx++;
+         }
+         memcached_rc =
+             memcached_mget(memcached_client, keys, key_sizes, post_ids.size());
+         if (memcached_rc != MEMCACHED_SUCCESS) {
+           LOG(error) << "Cannot get post_ids of request " << req_id << ": "
+                      << memcached_strerror(memcached_client, memcached_rc);
+           ServiceException se;
+           se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
+           se.message = memcached_strerror(memcached_client, memcached_rc);
+           memcached_pool_push(_memcached_client_pool, memcached_client);
+           throw se;
+         }
+       
+         char return_key[MEMCACHED_MAX_KEY];
+         size_t return_key_length;
+         char *return_value;
+         size_t return_value_length;
+         uint32_t flags;
+         auto get_span = opentracing::Tracer::Global()->StartSpan(
+             "post_storage_mmc_mget_client", {opentracing::ChildOf(&span->context())});
+       
+         while (true) {
+           return_value =
+               memcached_fetch(memcached_client, return_key, &return_key_length,
+                               &return_value_length, &flags, &memcached_rc);
+           if (return_value == nullptr) {
+             LOG(debug) << "Memcached mget finished";
+             break;
+           }
+           if (memcached_rc != MEMCACHED_SUCCESS) {
+             free(return_value);
+             memcached_quit(memcached_client);
+             memcached_pool_push(_memcached_client_pool, memcached_client);
+             LOG(error) << "Cannot get posts of request " << req_id;
+             ServiceException se;
+             se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
+             se.message = "Cannot get posts of request " + std::to_string(req_id);
+             throw se;
+           }
+           Post new_post;
+           json post_json = json::parse(
+               std::string(return_value, return_value + return_value_length));
+           new_post.req_id = post_json["req_id"];
+           new_post.timestamp = post_json["timestamp"];
+           new_post.post_id = post_json["post_id"];
+           new_post.creator.user_id = post_json["creator"]["user_id"];
+           new_post.creator.username = post_json["creator"]["username"];
+           new_post.post_type = post_json["post_type"];
+           new_post.text = post_json["text"];
+           for (auto &item : post_json["media"]) {
+             Media media;
+             media.media_id = item["media_id"];
+             media.media_type = item["media_type"];
+             new_post.media.emplace_back(media);
+           }
+           for (auto &item : post_json["user_mentions"]) {
+             UserMention user_mention;
+             user_mention.username = item["username"];
+             user_mention.user_id = item["user_id"];
+             new_post.user_mentions.emplace_back(user_mention);
+           }
+           for (auto &item : post_json["urls"]) {
+             Url url;
+             url.shortened_url = item["shortened_url"];
+             url.expanded_url = item["expanded_url"];
+             new_post.urls.emplace_back(url);
+           }
+           return_map.insert(std::make_pair(new_post.post_id, new_post));
+           post_ids_not_cached.erase(new_post.post_id);
+           free(return_value);
+         }
+         get_span->Finish();
+         memcached_quit(memcached_client);
+         memcached_pool_push(_memcached_client_pool, memcached_client);
+         for (int i = 0; i < post_ids.size(); ++i) {
+           delete keys[i];
+         }
+         delete[] keys;
+         delete[] key_sizes;
+
+    for (auto &post_id : post_ids) {
+         _return.emplace_back(return_map[post_id]);
+       }
+   
+    post_client->ReadPosts(_return, req_id, post_ids_not_cached, writer_text_map);
   } catch (...) {
     _post_client_pool->Remove(post_client_wrapper);
     LOG(error) << "Failed to read posts from post-storage-service";
