@@ -8,16 +8,16 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      mongodb:
+      social-graph-mongodb:
         condition: service_started
     restart: always
     entrypoint: SocialGraphService
     volumes:
       - ./config:/social-network-microservices/config
 
-  mongodb:
+  social-graph-mongodb:
     image: mongo:4.4.6
-    hostname: mongodb
+    hostname: social-graph-mongodb
     # ports:
     #   - 27018:27017
     restart: always
@@ -58,7 +58,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      mongodb:
+      post-storage-mongodb:
         condition: service_started
     entrypoint: PostStorageService
     volumes:
@@ -71,7 +71,12 @@ services:
     #      - 11212:11211
     restart: always
 
-  
+  post-storage-mongodb:
+    image: mongo:4.4.6
+    hostname: post-storage-mongodb
+    #    ports:
+    #      - 27019:27017
+    restart: always
 
   user-timeline-service:
     image: deathstarbench/social-network-microservices:latest
@@ -82,7 +87,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      mongodb:
+      user-timeline-mongodb:
         condition: service_started
     entrypoint: UserTimelineService
     volumes:
@@ -95,7 +100,12 @@ services:
     #      - 6383:6379
     restart: always
 
-  
+  user-timeline-mongodb:
+    image: mongo:4.4.6
+    hostname: user-timeline-mongodb
+    #    ports:
+    #      - 27020:27017
+    restart: always
 
   url-shorten-service:
     image: deathstarbench/social-network-microservices:latest
@@ -107,7 +117,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      mongodb:
+      url-shorten-mongodb:
         condition: service_started
     volumes:
       - ./config:/social-network-microservices/config
@@ -119,7 +129,12 @@ services:
     #      - 11213:11211
     restart: always
 
-  
+  url-shorten-mongodb:
+    image: mongo:4.4.6
+    hostname: url-shorten-mongodb
+    #    ports:
+    #      - 27021:27017
+    restart: always
 
   user-service:
     image: deathstarbench/social-network-microservices:latest
@@ -130,7 +145,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      mongodb:
+      user-mongodb:
         condition: service_started
     entrypoint: UserService
     volumes:
@@ -143,7 +158,12 @@ services:
     #      - 11214:11211
     restart: always
 
-  
+  user-mongodb:
+    image: mongo:4.4.6
+    hostname: user-mongodb
+    # ports:
+    #   - 27023:27017
+    restart: always
 
   media-service:
     image: deathstarbench/social-network-microservices:latest
@@ -153,7 +173,7 @@ services:
     depends_on:
       jaeger-agent:
         condition: service_started
-      mongodb:
+      media-mongodb:
         condition: service_started
     restart: always
     entrypoint: MediaService
@@ -167,7 +187,12 @@ services:
     #      - 11215:11211
     restart: always
 
-  
+  media-mongodb:
+    image: mongo:4.4.6
+    hostname: media-mongodb
+    #    ports:
+    #      - 27024:27017
+    restart: always
 
   text-service:
     image: deathstarbench/social-network-microservices:latest
