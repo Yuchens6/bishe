@@ -155,11 +155,44 @@ void PostStorageHandler::StorePost(
     throw se;
   }
 
+  bson_t *query = bson_new();
+  BSON_APPEND_INT64(query, "post_id", post_id);
+  mongoc_cursor_t *cursor =
+      mongoc_collection_find_with_opts(collection, query, nullptr, nullptr);
+  const bson_t *doc;
+  bool found = mongoc_cursor_next(cursor, &doc);
+  auto post_json_char = bson_as_json(doc, nullptr);
+  json post_json = json::parse(post_json_char);
+
   bson_destroy(new_doc);
   mongoc_collection_destroy(collection);
   mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
 
+  //插入memcached
+  memcached_return_t memcached_rc;
+  memcached_st *memcached_client =
+      memcached_pool_pop(_memcached_client_pool, true, &memcached_rc);
+  
+  if (!memcached_client) {
+    ServiceException se;
+    se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
+    se.message = "Failed to pop a client from memcached pool";
+    throw se;
+  }
+
+  std::string post_id_str = std::to_string(post.post_id);
+  memcached_rc = memcached_set(
+          memcached_client, post_id_str.c_str(), post_id_str.length(),
+          post_json_char, std::strlen(post_json_char), static_cast<time_t>(0),
+          static_cast<uint32_t>(0));
+      if (memcached_rc != MEMCACHED_SUCCESS) {
+        LOG(warning) << "Failed to set post to Memcached: "
+                     << memcached_strerror(memcached_client, memcached_rc);
+      }
+  bson_free(post_json_char);
   span->Finish();
+
+  memcached_pool_push(_memcached_client_pool, memcached_client);
 }
 
 void PostStorageHandler::ReadPost(
