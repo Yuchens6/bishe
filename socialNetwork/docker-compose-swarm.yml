@@ -113,7 +113,7 @@ services:
     image: mongo:4.4.6
     command: mongod --replSet rs0
     depends_on:
-      - mongo
+      - mongodb
     volumes:
       - ./config:/social-network-microservices/config
       - ./keys:/keys
