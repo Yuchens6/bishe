@@ -329,7 +329,7 @@ void HomeTimelineHandler::ReadHomeTimeline(
          size_t return_value_length;
          uint32_t flags;
          auto get_span = opentracing::Tracer::Global()->StartSpan(
-             "post_storage_mmc_mget_client", {opentracing::ChildOf(&span->context())});
+             "home-post_storage_mmc_mget_client", {opentracing::ChildOf(&span->context())});
        
          while (true) {
            return_value =
