@@ -393,8 +393,11 @@ void HomeTimelineHandler::ReadHomeTimeline(
     for (auto &post_id : post_ids) {
          _return.emplace_back(return_map[post_id]);
        }
-   
-    post_client->ReadPosts(_return, req_id, post_ids_not_cached, writer_text_map);
+   std::vector<int64_t> other_post_ids;
+     for(auto &post_id : post_ids_not_cached){
+         other_post_ids.emplace_back(post_id);
+     }
+    post_client->ReadPosts(_return, req_id, other_post_ids, writer_text_map);
   } catch (...) {
     _post_client_pool->Remove(post_client_wrapper);
     LOG(error) << "Failed to read posts from post-storage-service";
