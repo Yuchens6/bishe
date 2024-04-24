@@ -65,7 +65,7 @@ UserTimelineHandler::UserTimelineHandler(
 }
 
 UserTimelineHandler::UserTimelineHandler(
-    Redis* redis_replica_pool, Redis* redis_primary_pool, mongoc_client_pool_t* mongodb_pool,*memcached_client_pool,
+    Redis* redis_replica_pool, Redis* redis_primary_pool, mongoc_client_pool_t* mongodb_pool,memcached_pool_st *memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>>* post_client_pool) {
     _redis_client_pool = nullptr;
     _redis_replica_pool = redis_replica_pool;
@@ -77,7 +77,7 @@ UserTimelineHandler::UserTimelineHandler(
 }
 
 UserTimelineHandler::UserTimelineHandler(
-    RedisCluster *redis_pool, mongoc_client_pool_t *mongodb_pool,*memcached_client_pool,
+    RedisCluster *redis_pool, mongoc_client_pool_t *mongodb_pool,memcached_pool_st *memcached_client_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool) {
   _redis_cluster_client_pool = redis_pool;
   _redis_replica_pool = nullptr;
@@ -305,12 +305,44 @@ void UserTimelineHandler::ReadUserTimeline(
     mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
   }
 
-  std::future<std::vector<Post>> post_future =
-      std::async(std::launch::async, [&]() {
 
-       std::vector<Post> _return_posts;
+  if (redis_update_map.size() > 0) {
+    auto redis_update_span = opentracing::Tracer::Global()->StartSpan(
+        "user_timeline_redis_update_client",
+        {opentracing::ChildOf(&span->context())});
+    try {
+      if (_redis_client_pool)
+        _redis_client_pool->zadd(std::to_string(user_id),
+                               redis_update_map.begin(),
+                               redis_update_map.end());
+      else if (IsRedisReplicationEnabled()) {
+          _redis_primary_pool->zadd(std::to_string(user_id),
+              redis_update_map.begin(),
+              redis_update_map.end());
+      }
+      else
+        _redis_cluster_client_pool->zadd(std::to_string(user_id),
+                               redis_update_map.begin(),
+                               redis_update_map.end());
 
-         if (post_ids.empty()) {
+    } catch (const Error &err) {
+      LOG(error) << err.what();
+      throw err;
+    }
+    redis_update_span->Finish();
+  }
+
+  auto post_client_wrapper = _post_client_pool->Pop();
+  if (!post_client_wrapper) {
+    ServiceException se;
+    se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
+    se.message = "Failed to connect to post-storage-service";
+    throw se;
+  }
+  auto post_client = post_client_wrapper->GetClient();
+  try {
+
+    if (post_ids.empty()) {
            return;
          }
        
@@ -424,63 +456,17 @@ void UserTimelineHandler::ReadUserTimeline(
          delete[] keys;
          delete[] key_sizes;
 
-        if (!post_ids_not_cached.empty()) {
-            auto post_client_wrapper = _post_client_pool->Pop();
-           if (!post_client_wrapper) {
-             ServiceException se;
-             se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
-             se.message = "Failed to connect to post-storage-service";
-             throw se;
-           }
-           
-           auto post_client = post_client_wrapper->GetClient();
-           try {
-             post_client->ReadPosts(_return_posts, req_id, post_ids_not_cached,
-                                    writer_text_map);
-           } catch (...) {
-             _post_client_pool->Remove(post_client_wrapper);
-             LOG(error) << "Failed to read posts from post-storage-service";
-             throw;
-           }
-           _post_client_pool->Keepalive(post_client_wrapper);
-        }
-       for (auto &post_id : post_ids) {
-         _return_posts.emplace_back(return_map[post_id]);
+    for (auto &post_id : post_ids) {
+         _return.emplace_back(return_map[post_id]);
        }
-        
-        return _return_posts;
-      });
-
-  if (redis_update_map.size() > 0) {
-    auto redis_update_span = opentracing::Tracer::Global()->StartSpan(
-        "user_timeline_redis_update_client",
-        {opentracing::ChildOf(&span->context())});
-    try {
-      if (_redis_client_pool)
-        _redis_client_pool->zadd(std::to_string(user_id),
-                               redis_update_map.begin(),
-                               redis_update_map.end());
-      else if (IsRedisReplicationEnabled()) {
-          _redis_primary_pool->zadd(std::to_string(user_id),
-              redis_update_map.begin(),
-              redis_update_map.end());
-      }
-      else
-        _redis_cluster_client_pool->zadd(std::to_string(user_id),
-                               redis_update_map.begin(),
-                               redis_update_map.end());
-
-    } catch (const Error &err) {
-      LOG(error) << err.what();
-      throw err;
-    }
-    redis_update_span->Finish();
-  }
-
-  try {
-    _return = post_future.get();
+   std::vector<int64_t> other_post_ids;
+     for(auto &post_id : post_ids_not_cached){
+         other_post_ids.emplace_back(post_id);
+     }
+    post_client->ReadPosts(_return, req_id, other_post_ids, writer_text_map);
   } catch (...) {
-    LOG(error) << "Failed to get post from post-storage-service";
+    _post_client_pool->Remove(post_client_wrapper);
+    LOG(error) << "Failed to read posts from post-storage-service";
     throw;
   }
   span->Finish();
