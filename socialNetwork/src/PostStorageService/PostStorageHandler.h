@@ -156,7 +156,7 @@ void PostStorageHandler::StorePost(
   }
 
   bson_t *query = bson_new();
-  BSON_APPEND_INT64(query, "post_id", post_id);
+  BSON_APPEND_INT64(query, "post_id", post.post_id);
   mongoc_cursor_t *cursor =
       mongoc_collection_find_with_opts(collection, query, nullptr, nullptr);
   const bson_t *doc;
