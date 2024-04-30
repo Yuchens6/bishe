@@ -9,6 +9,8 @@ add_executable(
 
 target_include_directories(
     HomeTimelineService PRIVATE
+    ${MONGOC_INCLUDE_DIRS}
+    ${LIBMEMCACHED_INCLUDE_DIR}
     /usr/local/include/jaegertracing
     /usr/local/include/hiredis
     /usr/local/include/sw
@@ -16,6 +18,8 @@ target_include_directories(
 
 target_link_libraries(
     HomeTimelineService
+    ${MONGOC_LIBRARIES}
+    ${LIBMEMCACHED_LIBRARIES}
     nlohmann_json::nlohmann_json
     ${THRIFT_LIB}
     ${CMAKE_THREAD_LIBS_INIT}
