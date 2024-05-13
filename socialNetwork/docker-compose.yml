@@ -88,6 +88,23 @@ services:
   memcached:
     image: memcached
     hostname: memcached
+    command: -m 40
+    #    ports:
+    #      - 11212:11211
+    restart: always
+    
+  home-memcached:
+    image: memcached
+    hostname: home-memcached
+    command: -m 30
+    #    ports:
+    #      - 11212:11211
+    restart: always
+    
+  usertimeline-memcached:
+    image: memcached
+    hostname: usertimeline-memcached
+    command: -m 80
     #    ports:
     #      - 11212:11211
     restart: always
