@@ -66,11 +66,11 @@ int main(int argc, char *argv[]) {
  
   int port = config_json["home-timeline-service"]["port"];
 
-    int memcached_conns = config_json["post-storage-memcached"]["connections"];
-  int memcached_timeout = config_json["post-storage-memcached"]["timeout_ms"];
+    int memcached_conns = config_json["home-memcached"]["connections"];
+  int memcached_timeout = config_json["home-memcached"]["timeout_ms"];
   //Memcached初始化用户池
   memcached_client_pool = init_memcached_client_pool(
-      config_json, "post-storage", 32, memcached_conns);
+      config_json, "home", 32, memcached_conns);
  
   if (memcached_client_pool == nullptr) {
     return EXIT_FAILURE;
