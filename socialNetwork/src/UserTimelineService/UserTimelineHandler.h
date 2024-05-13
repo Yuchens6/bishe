@@ -363,23 +363,20 @@ namespace social_network
       redis_update_span->Finish();
     }
 
-    auto post_client_wrapper = _post_client_pool->Pop();
-    if (!post_client_wrapper)
-    {
-      ServiceException se;
-      se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
-      se.message = "Failed to connect to post-storage-service";
-      throw se;
-    }
-
-    auto post_client = post_client_wrapper->GetClient();
-    try
-    {
-      if (post_ids.empty())
-      {
-        return;
-      }
-      std::set<int64_t> post_ids_not_cached(post_ids.begin(), post_ids.end());
+    std::future<std::vector<Post>> post_future =
+        std::async(std::launch::async, [&]()
+                   {
+        auto post_client_wrapper = _post_client_pool->Pop();
+        if (!post_client_wrapper) {
+          ServiceException se;
+          se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
+          se.message = "Failed to connect to post-storage-service";
+          throw se;
+        }
+        std::vector<Post> _return_posts;
+        auto post_client = post_client_wrapper->GetClient();
+        try {
+          std::set<int64_t> post_ids_not_cached(post_ids.begin(), post_ids.end());
       if (post_ids_not_cached.size() != post_ids.size())
       {
         LOG(error) << "Post_ids are duplicated";
@@ -501,9 +498,9 @@ namespace social_network
 
       for (auto &post_id : post_ids)
       {
-        _return.emplace_back(return_map[post_id]);
+        _return_posts.emplace_back(return_map[post_id]);
       }
-      if (!post_ids_not_cached.empty())
+          if (!post_ids_not_cached.empty())
       {
         std::vector<int64_t> other_post_ids;
         for (auto &post_id : post_ids_not_cached)
@@ -514,7 +511,7 @@ namespace social_network
         post_client->ReadPosts(new_return, req_id, other_post_ids, writer_text_map);
         for (auto &post : new_return)
         {
-          _return.emplace_back(post);
+          _return_posts.emplace_back(post);
           std::string post_id_str = std::to_string(post.post_id);
           bson_t *new_doc = bson_new();
           BSON_APPEND_INT64(new_doc, "post_id", post.post_id);
@@ -583,21 +580,56 @@ namespace social_network
               post_json_char, std::strlen(post_json_char), static_cast<time_t>(0),
               static_cast<uint32_t>(0));
         }
-        memcached_pool_push(_memcached_client_pool, memcached_client);
+        
       }
-      else
+      memcached_pool_push(_memcached_client_pool, memcached_client);
+        } catch (...) {
+          _post_client_pool->Remove(post_client_wrapper);
+          LOG(error) << "Failed to read posts from post-storage-service";
+          throw;
+        }
+        _post_client_pool->Keepalive(post_client_wrapper);
+        return _return_posts; });
+
+    if (redis_update_map.size() > 0)
+    {
+      auto redis_update_span = opentracing::Tracer::Global()->StartSpan(
+          "user_timeline_redis_update_client",
+          {opentracing::ChildOf(&span->context())});
+      try
       {
-        memcached_pool_push(_memcached_client_pool, memcached_client);
+        if (_redis_client_pool)
+          _redis_client_pool->zadd(std::to_string(user_id),
+                                   redis_update_map.begin(),
+                                   redis_update_map.end());
+        else if (IsRedisReplicationEnabled())
+        {
+          _redis_primary_pool->zadd(std::to_string(user_id),
+                                    redis_update_map.begin(),
+                                    redis_update_map.end());
+        }
+        else
+          _redis_cluster_client_pool->zadd(std::to_string(user_id),
+                                           redis_update_map.begin(),
+                                           redis_update_map.end());
       }
+      catch (const Error &err)
+      {
+        LOG(error) << err.what();
+        throw err;
+      }
+      redis_update_span->Finish();
+    }
+
+    try
+    {
+      _return = post_future.get();
     }
     catch (...)
     {
-      _post_client_pool->Remove(post_client_wrapper);
-      LOG(error) << "Failed to read posts from post-storage-service";
+      LOG(error) << "Failed to get post from post-storage-service";
       throw;
     }
-
-    _post_client_pool->Keepalive(post_client_wrapper);
     span->Finish();
   }
 
