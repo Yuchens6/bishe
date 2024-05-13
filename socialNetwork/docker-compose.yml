@@ -43,12 +43,12 @@ services:
     #   - 6380:6379
     restart: always
     
-#  home-timeline-redis:
- #   image: redis
- #   hostname: home-timeline-redis
-    # ports:
-    #   - 6381:6379
-  #  restart: always
+ home-timeline-redis:
+   image: redis
+   hostname: home-timeline-redis
+    ports:
+      - 6381:6379
+   restart: always
 
   compose-post-service:
     image: deathstarbench/social-network-microservices:latest
