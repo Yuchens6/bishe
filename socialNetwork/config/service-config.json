@@ -92,6 +92,22 @@
     "connections": 512,
     "binary_protocol": 1
   },
+  "home-memcached": {
+    "keepalive_ms": 10000,
+    "addr": "home-memcached",
+    "timeout_ms": 10000,
+    "port": 11211,
+    "connections": 512,
+    "binary_protocol": 1
+  },
+  "usertimeline-memcached": {
+    "keepalive_ms": 10000,
+    "addr": "usertimeline-memcached",
+    "timeout_ms": 10000,
+    "port": 11211,
+    "connections": 512,
+    "binary_protocol": 1
+  },
   "ssl": {
     "serverKeyPath": "/keys/server.key",
     "caPath": "/keys/CA.pem",
@@ -116,7 +132,7 @@
   },
   "home-timeline-redis": {
     "keepalive_ms": 10000,
-    "addr": "redis",
+    "addr": "home-timeline-redis",
     "timeout_ms": 10000,
     "port": 6379,
     "connections": 512,
