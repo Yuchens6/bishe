@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   social-graph-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: social-graph-service
     #    ports:
     #      - 10000:9090
@@ -51,7 +51,7 @@ services:
    restart: always
 
   compose-post-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: compose-post-service
     #    ports:
     #      - 10001:9090
@@ -64,7 +64,7 @@ services:
       - ./config:/social-network-microservices/config
 
   post-storage-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: post-storage-service
     ports:
       - 10002:9090
@@ -117,7 +117,7 @@ services:
 #    restart: always
 
   user-timeline-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: user-timeline-service
     #    ports:
     #      - 10003:9090
@@ -146,7 +146,7 @@ services:
  #   restart: always
 
   url-shorten-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: url-shorten-service
     #    ports:
     #      - 10004:9090
@@ -175,7 +175,7 @@ services:
    # restart: always
 
   user-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: user-service
     #    ports:
     #      - 10005:9090
@@ -204,7 +204,7 @@ services:
    # restart: always
 
   media-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: media-service
     #    ports:
     #      - 10006:9090
@@ -233,7 +233,7 @@ services:
    # restart: always
 
   text-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: text-service
     #    ports:
     #      - 10007:9090
@@ -246,7 +246,7 @@ services:
       - ./config:/social-network-microservices/config
 
   unique-id-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: unique-id-service
     #    ports:
     #      - 10008:9090
@@ -259,7 +259,7 @@ services:
       - ./config:/social-network-microservices/config
 
   user-mention-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: user-mention-service
     #    ports:
     #      - 10009:9090
@@ -272,7 +272,7 @@ services:
       - ./config:/social-network-microservices/config
 
   home-timeline-service:
-    image: deathstarbench/social-network-microservices:latest
+    image: bench
     hostname: home-timeline-service
     #    ports:
     #      - 10010:9090
