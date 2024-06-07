@@ -88,6 +88,30 @@ services:
       - "-I 32m"
       - "-c 4096"
 
+  home-memcached:
+    depends_on:
+      - jaeger-agent
+      - jaeger-query
+    hostname: home-memcached
+    image: memcached
+    command:
+      - "-m 16384"
+      - "-t 8"
+      - "-I 32m"
+      - "-c 4096"
+
+  usertimeline-memcached:
+    depends_on:
+      - jaeger-agent
+      - jaeger-query
+    hostname: usertimeline-memcached
+    image: memcached
+    command:
+      - "-m 16384"
+      - "-t 8"
+      - "-I 32m"
+      - "-c 4096"
+
   mongodb:
     depends_on:
       - jaeger-agent
